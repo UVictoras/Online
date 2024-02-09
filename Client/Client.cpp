@@ -7,6 +7,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
+#define PORT 82
 
 // Variables globales :
 HINSTANCE hInst;                                // instance actuelle
@@ -55,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Écoute sur toutes les interfaces locales
-    serverAddr.sin_port = htons(82); // Port d'écoute
+    serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
         int error = WSAGetLastError();
@@ -65,8 +66,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             WSACleanup();
             return 1;
         }
-    }
+    } 
+    else {
+        EventManager::Initialize(); 
+        GameManager::Initialize(); //Initializing GameManager's singleton instance
 
+        GameManager::Get()->GameLoop(); 
+
+        return 0;
+    }
 
     MSG msg;
 
