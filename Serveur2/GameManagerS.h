@@ -1,4 +1,5 @@
 #pragma once
+#include "PlayerS.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include "../json-develop/single_include/nlohmann/json.hpp"
@@ -34,11 +35,15 @@ public:
 
 	int m_iTurn;
 
+	vector<Player*> m_pPlayers;
+
+	vector<int> m_Grid;
+
 	GameManager();
 
-	void CreateGrid();
+	void AssignPlayer();
 
-	void CreateSign();
+	void ChangeTurn();
 
 	void CheckWin();
 
@@ -46,12 +51,12 @@ public:
 
 	bool IsFullGrid();
 
-
 	void GameLoop();
 
 	//Events
 
 	void CloseWindow();
 
-	void PlaceSign();
+	void PlaceSign(int jIndex, int jId);
+
 };
