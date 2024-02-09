@@ -1,6 +1,5 @@
 #include "GameManagerS.h"
 #include "Math.h"
-#include "PlayerS.h"
 #include <iostream>
 #include <sstream>
 
@@ -13,18 +12,6 @@ using namespace std;
 sf::Event pressed;
 
 GameManager* GameManager::pInstance = nullptr;
-
-/*
------------------------------------------------------------------------
-|      Following are the functions used in the EventManager maps      |
------------------------------------------------------------------------
-*/
-
-
-void EventPlaceSign()
-{
-    GameManager::Get()->PlaceSign();
-}
 
 /*
 -----------------------------------------------------------------------
@@ -85,45 +72,51 @@ void GameManager::CheckWin()
 
     // VERIFICATION LINE
     for (int y = 0; y < 3; y++) {
-        if (m_gCasesBack[y * 3] != nullptr and m_gCasesBack[y * 3 + 1] != nullptr and m_gCasesBack[y * 3 + 2] != nullptr) {
-            if (m_gCasesBack[y * 3]->m_bType == m_gCasesBack[y * 3 + 1]->m_bType and m_gCasesBack[y * 3 + 2]->m_bType == m_gCasesBack[y * 3]->m_bType) {
-                if (m_gCasesBack[y * 3]->m_bType == true)
-                    m_bWon1 = true;
+        if (m_Grid[y * 3] != 0 and m_Grid[y * 3 + 1] != 0 and m_Grid[y * 3 + 2] != 0) {
+            if (m_Grid[y * 3] == m_Grid[y * 3 + 1] and m_Grid[y * 3 + 2] == m_Grid[y * 3]) {
+                if (m_Grid[y] == m_pPlayers[0]->m_sSign)
+                    m_pPlayers[0]->m_sWin = true;
                 else
-                    m_bWon2 = true;
+                    m_pPlayers[1]->m_sWin = true;
             }
         }
-   }
 
-    // VERIFICATION DIAGONAL
-    if (m_gCasesBack[0] != nullptr and m_gCasesBack[4] != nullptr and m_gCasesBack[8] != nullptr) {
-        if (m_gCasesBack[0]->m_bType == m_gCasesBack[4]->m_bType and m_gCasesBack[8]->m_bType == m_gCasesBack[0]->m_bType) {
-            if (m_gCasesBack[0]->m_bType == true)
-                m_bWon1 = true;
-            else
-                m_bWon2 = true;
+        // VERIFICATION DIAGONAL
+        if (m_Grid[0] != 0 and m_Grid[4] != 0 and m_Grid[8] != 0) {
+            if (m_Grid[0] == m_Grid[4] and m_Grid[8] == m_Grid[0]) {
+                if (m_Grid[0] == m_pPlayers[0]->m_sSign)
+                    m_pPlayers[0]->m_sWin = true;
+                else
+                    m_pPlayers[1]->m_sWin = true;
+            }
         }
-    }
-    if (m_gCasesBack[2] != nullptr and m_gCasesBack[4] != nullptr and m_gCasesBack[6] != nullptr) {
-        if (m_gCasesBack[2]->m_bType == m_gCasesBack[4]->m_bType and m_gCasesBack[6]->m_bType == m_gCasesBack[2]->m_bType) {
-            if (m_gCasesBack[2]->m_bType == true)
-                m_bWon1 = true;
-            else
-                m_bWon2 = true;
+        if (m_Grid[2] != 0 and m_Grid[4] != 0 and m_Grid[6] != 0) {
+            if (m_Grid[2] == m_Grid[4] and m_Grid[6] == m_Grid[2]) {
+                if (m_Grid[3] == m_pPlayers[0]->m_sSign)
+                    m_pPlayers[0]->m_sWin = true;
+                else
+                    m_pPlayers[1]->m_sWin = true;
+            }
         }
-    }
 
+    }
 }
 
 void GameManager::CheckDraw()
 {
-    for (GameObject* cCase : m_gCasesBack)
+    for (int i : m_Grid)
     {
-        if (cCase == nullptr) {
+        if (i == 0) {
            m_bDraw = false;
            return;
         }
 
     }
     m_bDraw = true;
+}
+
+void GameManager::GameLoop() {
+    while (m_pPlayers[0]->m_sWin == false and m_pPlayers[1]->m_sWin == false) {
+
+    }
 }

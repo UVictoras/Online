@@ -1,4 +1,5 @@
 #pragma once
+#include "PlayerS.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include "../json-develop/single_include/nlohmann/json.hpp"
