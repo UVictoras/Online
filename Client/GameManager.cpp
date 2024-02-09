@@ -10,6 +10,7 @@
 using json = nlohmann::json;
 using namespace std;
 sf::Event pressed;
+json j; //json message to send to server
 
 GameManager* GameManager::pInstance = nullptr;
 
@@ -43,7 +44,7 @@ void GameManager::CloseWindow()
 void GameManager::PlaceSign()
 {
 
-    /*for (Case* cCase : m_cCasesList)
+    for (Case* cCase : m_cCasesList)
     {
         if (Math::IsInsideInterval(vLocalPosition.x, cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
         {
@@ -68,18 +69,20 @@ void GameManager::PlaceSign()
                     //m_pPlayers[0]->MakePlay(cCase, &m_iTurn, m_tTextureX, m_tTextureCircle);
                     //sf::RectangleShape oRectangle(sf::Vector2f(50.f, 50.f));
                     //oRectangle.setFillColor(sf::Color::Red); 
-
                 }
+                // reset json and fill it with the cell player interacted with
+                j.clear();
+                j["cell"] = cCase->m_iIndex;
             }
         }
-    }*/
+    }
 
 	// create a JSON object
 	grid =
 	{
         "grid", {0,0,0,0,0,0,0,0,0} 
 	};
-	std::string textj = grid.dump();
+	std::string textgrid = grid.dump();
 
 	// std::stringstream box_message;
 	// box_message << "UwU " << j;
@@ -87,6 +90,11 @@ void GameManager::PlaceSign()
 	// int value = j["object"]["value"];
 	// std::stringstream new_box_message;
 	// new_box_message << "The value of " << currency << " is " << value;
+}
+
+std::string GameManager::GetJson() {
+    std::string textj = j.dump();
+    return textj;
 }
 
 GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <string>
 #include "../json-develop/single_include/nlohmann/json.hpp"
 
 using json = nlohmann::json;

@@ -5,6 +5,7 @@
 #include "Client.h"
 #include <winsock2.h>
 #include <iostream>
+#include <sstream>
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
@@ -20,6 +21,14 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+// MessageBox for variables
+#define MSGBOX(x) \
+{ \
+   std::ostringstream oss; \
+   oss << x; \
+   MessageBox(oss.str().c_str(), "Msg Title", MB_OK | MB_ICONQUESTION); \
+} // ex: MSGBOX("text"<<variable);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -72,6 +81,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         GameManager::Initialize(); //Initializing GameManager's singleton instance
 
         GameManager::Get()->GameLoop();
+        std::string textj = GameManager::Get()->GetJson();
+
+
+        //MessageBoxW(hWnd, ("JSON to send: "+textj).c_str(), MB_OK | MB_ICONERROR);
 
         WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
@@ -84,17 +97,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 closesocket(sock);
                 WSACleanup();
                 DestroyWindow(hWnd);
+                MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
                 return 1;
             }
             return 0;
         }
+
+        bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
+        if (bytesSent == SOCKET_ERROR)
+        {
+            if (WSAGetLastError() != WSAEWOULDBLOCK)
+            {
+                closesocket(sock);
+                WSACleanup();
+                DestroyWindow(hWnd);
+                MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
+                return 1;
+            }
+            return 0;
+        }
+
         MSG msg;
 
         while (true)
         {
             // Boucle de messages principale :
             while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-            {
+            {   
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
