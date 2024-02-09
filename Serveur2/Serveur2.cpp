@@ -4,9 +4,11 @@
 #include "framework.h"
 #include "Serveur2.h"
 #include <winsock2.h>
+#include <iostream>
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
+#define PORT 82
 
 // Variables globales :
 HINSTANCE hInst;     
@@ -20,21 +22,22 @@ HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+//int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+//                     _In_opt_ HINSTANCE hPrevInstance,
+//                     _In_ LPWSTR    lpCmdLine,
+//                     _In_ int       nCmdShow)
+int main()
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+//    UNREFERENCED_PARAMETER(hPrevInstance);
+//    UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Placez le code ici.
-
+    HINSTANCE hInstance = GetModuleHandleA(0);
     // Initialise les chaînes globales
     MyRegisterClass(hInstance);
 
     // Effectue l'initialisation de l'application :
-    hWnd = InitInstance(hInstance, nCmdShow);
+    hWnd = InitInstance(hInstance, 0);
 
     if (hWnd == NULL) {
         return 1;
@@ -53,13 +56,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return 1;
     }
 
-    WSAAsyncSelect(listenSocket, hWnd, WM_USER + 1, FD_ACCEPT);
-
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY; // Écoute sur toutes les interfaces locales
-    serverAddr.sin_port = htons(82); // Port d'écoute
+    serverAddr.sin_port = htons(PORT); // Port d'écoute
     if (bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
         closesocket(listenSocket);
         WSACleanup();
@@ -73,6 +74,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return 1;
     }
 
+    WSAAsyncSelect(listenSocket, hWnd, WM_USER + 1, FD_ACCEPT);
+
     MSG msg;
 
     // Boucle de messages principale :
@@ -81,6 +84,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
 
     return (int) msg.wParam;
 }
@@ -161,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     sAccept = accept(wParam, NULL, NULL);
                     MessageBox(hWnd, L"New connection", L"Notification", MB_OK | MB_ICONINFORMATION);
-                    WSAAsyncSelect(sAccept, hWnd, WM_USER + 1, FD_READ | FD_WRITE | FD_CLOSE);
+                    WSAAsyncSelect(sAccept, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
                     break;
                 }
                 case FD_READ:
@@ -172,31 +176,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     {
                         if (WSAGetLastError() != WSAEWOULDBLOCK)
                         {
+                            MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONINFORMATION);
                             closesocket(sInfoSocket);
                             return 0;
                         }
                     }
                     else 
                     {
-                        MessageBox(hWnd, L"New notification", L"Notification", MB_OK | MB_ICONINFORMATION);
-                    }
-                    break;
-                }
-                case FD_WRITE:
-                {
-                    sInfoSocket = wParam;
-
-                    if (WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL) == SOCKET_ERROR)
-                    {
-                        if (WSAGetLastError() != WSAEWOULDBLOCK)
-                        {
-                            closesocket(sInfoSocket);
-                            return 0;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
+                        std::cout << &bBuffer.buf;
                     }
                     break;
                 }

@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "Client.h"
 #include <winsock2.h>
+#include <iostream>
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
@@ -50,8 +51,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return 1;
     }
 
-    WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_CONNECT | FD_WRITE | FD_READ);
-
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
@@ -73,18 +72,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         GameManager::Get()->GameLoop(); 
 
+    WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
+
+    const char* message = "Hello, server!";
+    int bytesSent = send(sock, message, strlen(message), 0);
+    if (bytesSent == SOCKET_ERROR)
+    {
+        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        {
+            closesocket(sock);
+            WSACleanup();
+            DestroyWindow(hWnd);
+            return 1;
+        }
         return 0;
     }
 
     MSG msg;
 
-    // Boucle de messages principale :
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true) 
     {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        // Boucle de messages principale :
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+
+
+        //Logic
+        //Render
     }
 
+    // Cleanup
+    closesocket(sock);
+    WSACleanup();
+    DestroyWindow(hWnd);
     return (int)msg.wParam;
 }
 
@@ -147,8 +171,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  
-
     switch (message)
     {
         case WM_USER + 1:
@@ -159,10 +181,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     break;
                 }
-                case FD_WRITE:
-                {
-                    break;
-                }
+                //case FD_WRITE:
+                //{
+                //    sInfoSocket = wParam;
+                //    // WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL)
+                //    // send(sInfoSocket, message, strlen(message), 0)
+                //    const char* message = "Hello, server!";
+                //    MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
+
+                //    if (WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL) == SOCKET_ERROR)
+                //    {
+                //        if (WSAGetLastError() != WSAEWOULDBLOCK)
+                //        {
+                //            closesocket(sInfoSocket);
+                //            return 0;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
+                //    }
+                //    break;
+                //}
                 case FD_CLOSE:
                 {
                     break;
