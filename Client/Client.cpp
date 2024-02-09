@@ -83,6 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         GameManager::Get()->GameLoop();
         std::string textj = GameManager::Get()->GetJson();
+        MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
 
         //MessageBoxW(hWnd, ("JSON to send: "+textj).c_str(), MB_OK | MB_ICONERROR);
