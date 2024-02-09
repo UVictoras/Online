@@ -85,6 +85,10 @@ int main()
         DispatchMessage(&msg);
     }
 
+    bool stop = false;
+    while (!stop) {
+
+    }
 
     return (int) msg.wParam;
 }
@@ -164,7 +168,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case FD_ACCEPT:
                 {
                     sAccept = accept(wParam, NULL, NULL);
-                    MessageBox(hWnd, L"New connection", L"Notification", MB_OK | MB_ICONINFORMATION);
+                    std::cout << "New connection on socket " << sAccept;
+                    //MessageBox(hWnd, L"New connection", L"Notification", MB_OK | MB_ICONINFORMATION);
                     WSAAsyncSelect(sAccept, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
                     break;
                 }
