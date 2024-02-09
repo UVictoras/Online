@@ -65,7 +65,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             WSACleanup();
             return 1;
         }
-    }
+    } 
+    else {
+        EventManager::Initialize(); 
+        GameManager::Initialize(); //Initializing GameManager's singleton instance
+
+        GameManager::Get()->GameLoop(); 
 
     WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
@@ -80,6 +85,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DestroyWindow(hWnd);
             return 1;
         }
+        return 0;
     }
 
     MSG msg;
