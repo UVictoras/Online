@@ -63,55 +63,51 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
+            MessageBox(hWnd,L"La connection au serveur a echoue.", L"Erreur de connection", MB_OK | MB_ICONERROR);
             return 1;
         }
-    } 
+    }
     else {
-        EventManager::Initialize(); 
+        EventManager::Initialize();
         GameManager::Initialize(); //Initializing GameManager's singleton instance
 
-        GameManager::Get()->GameLoop(); 
+        GameManager::Get()->GameLoop();
 
-    WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
+        WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
-    const char* message = "Hello, server!";
-    int bytesSent = send(sock, message, strlen(message), 0);
-    if (bytesSent == SOCKET_ERROR)
-    {
-        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        const char* message = "Hello, server!";
+        int bytesSent = send(sock, message, strlen(message), 0);
+        if (bytesSent == SOCKET_ERROR)
         {
-            closesocket(sock);
-            WSACleanup();
-            DestroyWindow(hWnd);
-            return 1;
+            if (WSAGetLastError() != WSAEWOULDBLOCK)
+            {
+                closesocket(sock);
+                WSACleanup();
+                DestroyWindow(hWnd);
+                return 1;
+            }
+            return 0;
         }
-        return 0;
-    }
+        MSG msg;
 
-    MSG msg;
-
-    while (true) 
-    {
-        // Boucle de messages principale :
-        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        while (true)
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            // Boucle de messages principale :
+            while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            //Logic
+            //Render
         }
-
-
-
-        //Logic
-        //Render
+        // Cleanup
+        closesocket(sock);
+        WSACleanup();
+        DestroyWindow(hWnd);
+        return (int)msg.wParam;
     }
-
-    // Cleanup
-    closesocket(sock);
-    WSACleanup();
-    DestroyWindow(hWnd);
-    return (int)msg.wParam;
 }
-
 
 
 //
