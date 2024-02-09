@@ -63,7 +63,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
+          
 			MessageBox(hWnd, L"La connection au serveur a echoue.", L"Erreur de connection", MB_OK | MB_ICONERROR);
+
             return 1;
         }
     }
@@ -100,8 +102,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
 
-
-
             //Logic
             //Render
         }
@@ -113,7 +113,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return (int)msg.wParam;
     }
 }
-
 
 
 //
