@@ -79,6 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     else {
         EventManager::Initialize();
         GameManager::Initialize(); //Initializing GameManager's singleton instance
+      
 
         GameManager::Get()->GameLoop();
         std::string textj = GameManager::Get()->GetJson();
@@ -103,7 +104,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 0;
         }
 
-        bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
+        // send json to server
+       /* bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
         if (bytesSent == SOCKET_ERROR)
         {
             if (WSAGetLastError() != WSAEWOULDBLOCK)
@@ -115,7 +117,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 return 1;
             }
             return 0;
-        }
+        }*/
 
         MSG msg;
 
