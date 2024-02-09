@@ -6,6 +6,7 @@ public:
 	char m_sName;
 	char m_sSign;
 	int m_sId;
+	bool m_sWin;
 
 	Player(char sSign, char sName, int sId);
 

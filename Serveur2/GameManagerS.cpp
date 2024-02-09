@@ -71,17 +71,14 @@ void GameManager::ChangeTurn() {
 
 void GameManager::CheckWin()
 {
-    m_bWon1 = false;
-    m_bWon2 = false;
-
     // VERIFICATION COLUMN
     for (int x = 0; x < 3; x++) {
         if (m_Grid[x] != 0 and m_Grid[x + 3] != 0 and m_Grid[x + 6] != 0) {
-            if (m_Grid[x] == m_Grid[x + 3] and m_Grid[x + 6]->m_bType == m_Grid[x]->m_bType) {
-                if (m_Grid[x]->m_bType == true)
-                    m_bWon1 = true;
+            if (m_Grid[x] == m_Grid[x + 3] and m_Grid[x + 6] == m_Grid[x]) {
+                if (m_Grid[x] == m_pPlayers[0]->m_sSign)
+                    m_pPlayers[0]->m_sWin = true;
                 else
-                    m_bWon2 = true;
+                    m_pPlayers[1]->m_sWin = true;
             }
         }
     }
