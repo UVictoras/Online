@@ -14,6 +14,8 @@ json j; //json message to send to server
 
 GameManager* GameManager::pInstance = nullptr;
 
+SOCKET* sock = nullptr;
+
 /*
 -----------------------------------------------------------------------
 |      Following are the functions used in the EventManager maps      |
@@ -35,6 +37,41 @@ void EventPlaceSign()
 |   Following are the methods corresponding to the GameManager Class  |
 -----------------------------------------------------------------------
 */
+
+GameManager::GameManager(SOCKET* input) : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
+{
+    sock = input;
+    m_bWon1 = false;
+    m_bWon2 = false;
+    m_bDraw = false;
+
+    m_rBackground = new GameObject(true, 0, 0, 920, 920, sf::Color::White);
+
+    CreateGrid();
+    CreateSign();
+
+    m_pPlayers[0] = new Player('x');
+    m_pPlayers[1] = new Player('o');
+
+    // create a JSON object
+    grid =
+    {
+        "grid", {0,0,0,0,0,0,0,0,0}
+    };
+    std::string textj = grid.dump();
+
+    // std::stringstream box_message;
+    // box_message << "UwU " << j;
+    // std::string currency = j["object"]["currency"];
+    // int value = j["object"]["value"];
+    // std::stringstream new_box_message;
+    // new_box_message << "The value of " << currency << " is " << value;
+
+
+    /*TextureManager::Get()->CreateTexture("img/blank.png", m_tTextureBlank);
+    TextureManager::Get()->CreateTexture("img/x.png", m_tTextureX);
+    TextureManager::Get()->CreateTexture("img/circle.png", m_tTextureCircle);*/
+}
 
 void GameManager::CloseWindow()
 {
@@ -78,11 +115,21 @@ void GameManager::PlaceSign()
     }
 
 	// create a JSON object
-	grid =
+	/*grid =
 	{
         "grid", {0,0,0,0,0,0,0,0,0} 
-	};
-	std::string textgrid = grid.dump();
+	};*/
+	std::string jtext = j.dump();
+    // send json to server
+    int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
+    if (bytesSent == SOCKET_ERROR)
+    {
+        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        {
+            closesocket(*sock);
+            WSACleanup();
+        }
+    }
 
 	// std::stringstream box_message;
 	// box_message << "UwU " << j;
@@ -95,40 +142,6 @@ void GameManager::PlaceSign()
 std::string GameManager::GetJson() {
     std::string textj = j.dump();
     return textj;
-}
-
-GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
-{
-    m_bWon1 = false;
-    m_bWon2 = false;
-    m_bDraw = false;
-
-    m_rBackground = new GameObject(true, 0, 0, 920, 920, sf::Color::White);
-
-    CreateGrid();
-    CreateSign();
-
-    m_pPlayers[0] = new Player('x');
-    m_pPlayers[1] = new Player('o');
-
-	// create a JSON object
-	grid =
-	{
-		"grid", {0,0,0,0,0,0,0,0,0}
-	};
-	std::string textj = grid.dump();
-
-	// std::stringstream box_message;
-	// box_message << "UwU " << j;
-	// std::string currency = j["object"]["currency"];
-	// int value = j["object"]["value"];
-	// std::stringstream new_box_message;
-	// new_box_message << "The value of " << currency << " is " << value;
-
-
-    /*TextureManager::Get()->CreateTexture("img/blank.png", m_tTextureBlank);
-    TextureManager::Get()->CreateTexture("img/x.png", m_tTextureX);
-    TextureManager::Get()->CreateTexture("img/circle.png", m_tTextureCircle);*/
 }
 
 void GameManager::CreateGrid()

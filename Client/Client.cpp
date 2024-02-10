@@ -63,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("192.168.83.128"); // Écoute sur toutes les interfaces locales
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.178.128"); // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
@@ -78,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     else {
         EventManager::Initialize();
-        GameManager::Initialize(); //Initializing GameManager's singleton instance
+        GameManager::Initialize(&sock); //Initializing GameManager's singleton instance
       
 
         GameManager::Get()->GameLoop();
@@ -105,20 +105,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 0;
         }
 
-        // send json to server
-       /* bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
-        if (bytesSent == SOCKET_ERROR)
-        {
-            if (WSAGetLastError() != WSAEWOULDBLOCK)
-            {
-                closesocket(sock);
-                WSACleanup();
-                DestroyWindow(hWnd);
-                MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
-                return 1;
-            }
-            return 0;
-        }*/
+        //// send json to server
+        //bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
+        //if (bytesSent == SOCKET_ERROR)
+        //{
+        //    if (WSAGetLastError() != WSAEWOULDBLOCK)
+        //    {
+        //        closesocket(sock);
+        //        WSACleanup();
+        //        DestroyWindow(hWnd);
+        //        MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
+        //        return 1;
+        //    }
+        //    return 0;
+        //}
 
         MSG msg;
 
