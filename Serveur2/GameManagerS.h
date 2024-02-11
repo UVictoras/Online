@@ -46,7 +46,7 @@ public:
 
 	void GameReady();
 
-	void SendJSON(bool GameRunnig, bool ValidMove, bool PlayerTurn, Player* pPlayer);
+	void SendJSON(bool GameRunnig, bool ValidMove);
 
 	void ChangeTurn();
 

@@ -37,7 +37,7 @@ public:
 
 public:
 
-	Player* m_pPlayers[2];
+	Player* m_pPlayers;
 
 	Case* m_cCasesList[9];
 
@@ -63,6 +63,8 @@ public:
 
 	bool IsFullGrid();
 
+	// FAUT CREER LA FONCTION POUR RECUP LA REPONSE DU SERV, ET ASSIGNER L'ID DU JOUEUR
+	// CREER LA FONCTION POUR RECUPERER LA REPONSE DU SERV APRES AVOIR CLIQUER ET SI LE COUP EST VALIDE ON AFFICHE
 
 	void GameLoop(SOCKET sock,HWND hWnd);
 

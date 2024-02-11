@@ -31,21 +31,63 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
     m_pPlayer = new Player('o', " " , 2);
     m_pPlayers.push_back(m_pPlayer);
 
-    m_Grid.insert(m_Grid.end(), { 0,0,0,0,0,0,0,0,0 });
+    m_Grid = { 0,0,0,0,0,0,0,0,0 };
+    m_jServ["Grid"] = m_Grid;
 }
 
-void GameManager::AssignPlayer() {
-    //Récupere le premier JSON envoyer par le joueur, et assigne son nom
+void GameManager::AssignPlayer(json jClient, SOCKET* sSock) {
+    if (m_pPlayers[0]->m_sSock == NULL) {
+        m_pPlayers[0]->m_sName = jClient["Name"];
+        m_pPlayers[0]->m_sSock = *sSock;
+    }
+    else if (m_pPlayers[1]->m_sSock == NULL) {
+        m_pPlayers[1]->m_sName = jClient["Name"];
+        m_pPlayers[1]->m_sSock = *sSock;
+    }
 }
 
-void GameManager::PlaceSign(int jIndex, int jId) {
-    if (m_Grid[jIndex] == 0) {
-        if (m_pPlayers[m_iTurn]->m_sId == jId)
+void GameManager::PlaceSign(json jClient) {
+    if (m_Grid[jClient["Cell"]] == 0) {
+        if (m_pPlayers[m_iTurn]->m_sId == jClient["Id"])
         {
-            m_Grid[jIndex] = m_pPlayers[m_iTurn]->m_sSign;
+            m_Grid[jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
             ChangeTurn();
+            SendJSON(true, true);
+            return;
         }
     }
+    SendJSON(true, false);
+}
+
+void GameManager::GameReady() {
+    for (Player* pPlayer : m_pPlayers) {
+        if (pPlayer->m_sSock == NULL) {
+            SendJSON(false, false);
+            return;
+        }
+    }
+    SendJSON(true, false);
+}
+
+void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
+    for (Player* pPlayer : m_pPlayers) {
+        m_jServ["GameRunning"] = GameRunnig;
+        m_jServ["ValidMove"] = ValidMove;
+        m_jServ["PlayerTurn"] = (m_iTurn == pPlayer->m_sId) ? true : false;
+        m_jServ["Grid"] = m_Grid;
+        std::string jtext = m_jServ.dump() + "\n";
+        // send json to server
+        int bytesSent = send(pPlayer->m_sSock, jtext.c_str(), strlen(jtext.c_str()), 0);
+        if (bytesSent == SOCKET_ERROR)
+        {
+            if (WSAGetLastError() != WSAEWOULDBLOCK)
+            {
+                closesocket(pPlayer->m_sSock);
+                WSACleanup();
+            }
+        }
+    }
+   
 }
 
 void GameManager::ChangeTurn() {

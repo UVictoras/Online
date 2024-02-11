@@ -4,9 +4,10 @@
 class Player
 {
 public:
-	char m_sSign;
+	char m_sName;
+	int m_iId;
 
-	Player(char sSign);
+	Player();
 
 	void MakePlay(Case* cCase, int* iTurn, sf::Texture* tTextureX, sf::Texture* tTextureCircle);
 };

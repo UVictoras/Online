@@ -199,15 +199,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     int i = 0;
                     std::string message;
                     while (bBuffer.buf[i] != '\n' and i < bBuffer.len) {
-                        std::cout << bBuffer.buf[i];
                         message += bBuffer.buf[i];
                         i++;
                     }
                     json j = json::parse(message);
-                    std::cout << "Cell: " << j["cell"] << std::endl;
                     bBuffer.buf = nullptr;
                     bBuffer.buf = cBufferData;
-                    std::cout << std::endl;
                 }
             }
             break;

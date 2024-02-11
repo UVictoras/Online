@@ -1,8 +1,9 @@
 #include "Player.h"
 
-Player::Player(char sSign)
+Player::Player()
 {
-	m_sSign = sSign;
+	m_sName = ' ';
+	m_iId = -1;
 }
 
 void Player::MakePlay(Case* cCase, int* iTurn, sf::Texture* tTextureX, sf::Texture* tTextureCircle)

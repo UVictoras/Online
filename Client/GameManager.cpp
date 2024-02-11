@@ -10,7 +10,7 @@
 using json = nlohmann::json;
 using namespace std;
 sf::Event pressed;
-json j; //json message to send to server
+json jClient; //json message to send to server
 
 GameManager* GameManager::pInstance = nullptr;
 
@@ -50,8 +50,7 @@ GameManager::GameManager(SOCKET* input) : oWindow(sf::VideoMode(920, 920), "Cass
     CreateGrid();
     CreateSign();
 
-    m_pPlayers[0] = new Player('x');
-    m_pPlayers[1] = new Player('o');
+    m_pPlayers = new Player();
 
     // create a JSON object
     
@@ -83,40 +82,22 @@ void GameManager::PlaceSign()
         {
             if (Math::IsInsideInterval(vLocalPosition.y, cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
             {
-                if (m_iTurn % 2 == 0)
+                if (m_iTurn == m_pPlayers->m_iId)
                 {
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
-                        m_gCasesBack[cCase->m_iIndex] = new GameObject(true, cCase->m_fX + 290 / 2 - 100, cCase->m_fY + 290 / 2 - 100, 200, 200, sf::Color::Red);
+                        jClient.clear();
+                        jClient["Cell"] = cCase->m_iIndex;
+                        jClient["Name"] = m_pPlayers->m_sName;
+                        jClient["Id"] = m_pPlayers->m_iId;
                         m_iTurn++;
                     }
-
-                    //m_pPlayers[1]->MakePlay(cCase, &m_iTurn, m_tTextureX, m_tTextureCircle);
-
-                }
-                else
-                {
-                    if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
-                        m_gCasesBack[cCase->m_iIndex] = new GameObject(false, cCase->m_fX + 290 / 2 - 100, cCase->m_fY + 290 / 2 - 100, 100, 100, sf::Color::White);
-                        m_iTurn++;
-                    }
-                    //m_pPlayers[0]->MakePlay(cCase, &m_iTurn, m_tTextureX, m_tTextureCircle);
-                    //sf::RectangleShape oRectangle(sf::Vector2f(50.f, 50.f));
-                    //oRectangle.setFillColor(sf::Color::Red); 
                 }
                 // reset json and fill it with the cell player interacted with
-                j.clear();
-                j["cell"] = cCase->m_iIndex;
-                j["Name"] = "Test";
             }
         }
     }
 
-	// create a JSON object
-	/*grid =
-	{
-        "grid", {0,0,0,0,0,0,0,0,0} 
-	};*/
-	std::string jtext = j.dump() + "\n";
+    std::string jtext = jClient.dump() + "\n";
     // send json to server
     int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
     if (bytesSent == SOCKET_ERROR)
@@ -127,14 +108,8 @@ void GameManager::PlaceSign()
             WSACleanup();
         }
     }
-
-	// std::stringstream box_message;
-	// box_message << "UwU " << j;
-	// std::string currency = j["object"]["currency"];
-	// int value = j["object"]["value"];
-	// std::stringstream new_box_message;
-	// new_box_message << "The value of " << currency << " is " << value;
 }
+
 
 void GameManager::CreateGrid()
 {
