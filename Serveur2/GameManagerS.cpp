@@ -35,7 +35,7 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
 }
 
 void GameManager::AssignPlayer() {
-    //Récupere le premier JSON envoyer par le joueur, et assigne son nom
+    //RÃ©cupere le premier JSON envoyer par le joueur, et assigne son nom
 }
 
 void GameManager::PlaceSign(int jIndex, int jId) {

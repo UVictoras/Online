@@ -83,7 +83,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         EventManager::Initialize();
         GameManager::Initialize(&sock); //Initializing GameManager's singleton instance
       
-
         GameManager::Get()->GameLoop(sock, hWnd);
         //MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
