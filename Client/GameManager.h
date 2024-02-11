@@ -70,6 +70,4 @@ public:
 	void CloseWindow();
 
 	void PlaceSign();
-
-	std::string GetJson();
 };

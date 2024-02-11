@@ -80,7 +80,6 @@ void GameManager::CloseWindow()
 
 void GameManager::PlaceSign()
 {
-
     for (Case* cCase : m_cCasesList)
     {
         if (Math::IsInsideInterval(vLocalPosition.x, cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
@@ -137,11 +136,6 @@ void GameManager::PlaceSign()
 	// int value = j["object"]["value"];
 	// std::stringstream new_box_message;
 	// new_box_message << "The value of " << currency << " is " << value;
-}
-
-std::string GameManager::GetJson() {
-    std::string textj = j.dump();
-    return textj;
 }
 
 void GameManager::CreateGrid()
