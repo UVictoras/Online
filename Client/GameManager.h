@@ -3,6 +3,7 @@
 #include "Case.h"
 #include "Player.h"
 #include "../json-develop/single_include/nlohmann/json.hpp"
+#define NOMINMAX
 #include <winsock2.h>
 
 using json = nlohmann::json;

@@ -3,11 +3,12 @@
 
 #include "framework.h"
 #include "Serveur2.h"
-#include <winsock2.h>
 #include <iostream>
 #include <vector>
 #include <string>
 #include "../json-develop/single_include/nlohmann/json.hpp"
+#define NOMINMAX
+#include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")
 
 using json = nlohmann::json;

@@ -2,10 +2,9 @@
 #include "Math.h"
 #include <iostream>
 #include <sstream>
-
-#include <winsock2.h>
+#define NOMINMAX
 #include <vector>
-
+#include <winsock2.h>
 
 using json = nlohmann::json;
 using namespace std;
@@ -26,10 +25,10 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
     m_bDraw = false;
     m_iTurn = 0;
 
-    Player* m_pPlayer = new Player('x',' ',1);
+    Player* m_pPlayer = new Player('x', " ", 1);
     m_pPlayers.push_back(m_pPlayer);
 
-    m_pPlayer = new Player('o',' ',2);
+    m_pPlayer = new Player('o', " " , 2);
     m_pPlayers.push_back(m_pPlayer);
 
     m_Grid.insert(m_Grid.end(), { 0,0,0,0,0,0,0,0,0 });
@@ -41,11 +40,11 @@ void GameManager::AssignPlayer() {
 
 void GameManager::PlaceSign(int jIndex, int jId) {
     if (m_Grid[jIndex] == 0) {
-       if (m_pPlayers[m_iTurn]->m_sId == jId)
-       {
-           m_Grid[jIndex] = m_pPlayers[m_iTurn]->m_sSign;
-           ChangeTurn();
-       }
+        if (m_pPlayers[m_iTurn]->m_sId == jId)
+        {
+            m_Grid[jIndex] = m_pPlayers[m_iTurn]->m_sSign;
+            ChangeTurn();
+        }
     }
 }
 
@@ -107,8 +106,8 @@ void GameManager::CheckDraw()
     for (int i : m_Grid)
     {
         if (i == 0) {
-           m_bDraw = false;
-           return;
+            m_bDraw = false;
+            return;
         }
 
     }
