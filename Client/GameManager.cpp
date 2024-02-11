@@ -10,8 +10,11 @@
 using json = nlohmann::json;
 using namespace std;
 sf::Event pressed;
+json j; //json message to send to server
 
 GameManager* GameManager::pInstance = nullptr;
+
+SOCKET* sock = nullptr;
 
 /*
 -----------------------------------------------------------------------
@@ -35,6 +38,41 @@ void EventPlaceSign()
 -----------------------------------------------------------------------
 */
 
+GameManager::GameManager(SOCKET* input) : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
+{
+    sock = input;
+    m_bWon1 = false;
+    m_bWon2 = false;
+    m_bDraw = false;
+
+    m_rBackground = new GameObject(true, 0, 0, 920, 920, sf::Color::White);
+
+    CreateGrid();
+    CreateSign();
+
+    m_pPlayers[0] = new Player('x');
+    m_pPlayers[1] = new Player('o');
+
+    // create a JSON object
+    grid =
+    {
+        "grid", {0,0,0,0,0,0,0,0,0}
+    };
+    std::string textj = grid.dump();
+
+    // std::stringstream box_message;
+    // box_message << "UwU " << j;
+    // std::string currency = j["object"]["currency"];
+    // int value = j["object"]["value"];
+    // std::stringstream new_box_message;
+    // new_box_message << "The value of " << currency << " is " << value;
+
+
+    /*TextureManager::Get()->CreateTexture("img/blank.png", m_tTextureBlank);
+    TextureManager::Get()->CreateTexture("img/x.png", m_tTextureX);
+    TextureManager::Get()->CreateTexture("img/circle.png", m_tTextureCircle);*/
+}
+
 void GameManager::CloseWindow()
 {
     oWindow.close();
@@ -42,8 +80,7 @@ void GameManager::CloseWindow()
 
 void GameManager::PlaceSign()
 {
-
-    /*for (Case* cCase : m_cCasesList)
+    for (Case* cCase : m_cCasesList)
     {
         if (Math::IsInsideInterval(vLocalPosition.x, cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
         {
@@ -68,18 +105,30 @@ void GameManager::PlaceSign()
                     //m_pPlayers[0]->MakePlay(cCase, &m_iTurn, m_tTextureX, m_tTextureCircle);
                     //sf::RectangleShape oRectangle(sf::Vector2f(50.f, 50.f));
                     //oRectangle.setFillColor(sf::Color::Red); 
-
                 }
+                // reset json and fill it with the cell player interacted with
+                j.clear();
+                j["cell"] = cCase->m_iIndex;
             }
         }
-    }*/
+    }
 
 	// create a JSON object
-	grid =
+	/*grid =
 	{
         "grid", {0,0,0,0,0,0,0,0,0} 
-	};
-	std::string textj = grid.dump();
+	};*/
+	std::string jtext = j.dump() + "\n";
+    // send json to server
+    int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
+    if (bytesSent == SOCKET_ERROR)
+    {
+        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        {
+            closesocket(*sock);
+            WSACleanup();
+        }
+    }
 
 	// std::stringstream box_message;
 	// box_message << "UwU " << j;
@@ -87,40 +136,6 @@ void GameManager::PlaceSign()
 	// int value = j["object"]["value"];
 	// std::stringstream new_box_message;
 	// new_box_message << "The value of " << currency << " is " << value;
-}
-
-GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
-{
-    m_bWon1 = false;
-    m_bWon2 = false;
-    m_bDraw = false;
-
-    m_rBackground = new GameObject(true, 0, 0, 920, 920, sf::Color::White);
-
-    CreateGrid();
-    CreateSign();
-
-    m_pPlayers[0] = new Player('x');
-    m_pPlayers[1] = new Player('o');
-
-	// create a JSON object
-	grid =
-	{
-		"grid", {0,0,0,0,0,0,0,0,0}
-	};
-	std::string textj = grid.dump();
-
-	// std::stringstream box_message;
-	// box_message << "UwU " << j;
-	// std::string currency = j["object"]["currency"];
-	// int value = j["object"]["value"];
-	// std::stringstream new_box_message;
-	// new_box_message << "The value of " << currency << " is " << value;
-
-
-    /*TextureManager::Get()->CreateTexture("img/blank.png", m_tTextureBlank);
-    TextureManager::Get()->CreateTexture("img/x.png", m_tTextureX);
-    TextureManager::Get()->CreateTexture("img/circle.png", m_tTextureCircle);*/
 }
 
 void GameManager::CreateGrid()
@@ -218,7 +233,7 @@ bool GameManager::IsFullGrid()
     return true;
 }
 
-void GameManager::GameLoop()
+void GameManager::GameLoop(SOCKET sock, HWND hWnd)
 {
 
     sf::Clock oClock;
@@ -254,6 +269,8 @@ void GameManager::GameLoop()
             }
 
         }
+
+        
 
         oWindow.display();
         fDeltaTime = oClock.restart().asSeconds();

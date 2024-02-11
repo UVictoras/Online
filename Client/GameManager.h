@@ -3,6 +3,7 @@
 #include "Case.h"
 #include "Player.h"
 #include "../json-develop/single_include/nlohmann/json.hpp"
+#include <winsock2.h>
 
 using json = nlohmann::json;
 typedef void(*func)();
@@ -23,9 +24,9 @@ private:
 
 public:
 
-	static void Initialize()
+	static void Initialize(SOCKET* input)
 	{
-		GameManager::pInstance = new GameManager();
+		GameManager::pInstance = new GameManager(input);
 	}
 
 	static GameManager* Get()
@@ -49,7 +50,7 @@ public:
 
 	int m_iTurn;
 
-	GameManager();
+	GameManager(SOCKET* input);
 
 	void CreateGrid();
 
@@ -62,7 +63,7 @@ public:
 	bool IsFullGrid();
 
 
-	void GameLoop();
+	void GameLoop(SOCKET sock,HWND hWnd);
 
 	//Events
 
