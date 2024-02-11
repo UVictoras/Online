@@ -80,11 +80,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     else {
         EventManager::Initialize();
-        GameManager::Initialize(&sock); //Initializing GameManager's singleton instance
+        GameManager::Initialize(); //Initializing GameManager's singleton instance
       
 
-        GameManager::Get()->GameLoop(sock,hWnd);
-        std::string textj = GameManager::Get()->GetJson();
+        GameManager::Get()->GameLoop();
         //MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
 
