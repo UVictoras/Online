@@ -72,7 +72,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
-            MessageBox(hWnd,L"La connection au serveur a echoue.", L"Erreur de connection", MB_OK | MB_ICONERROR);
+          
+			MessageBox(hWnd, L"La connection au serveur a echoue.", L"Erreur de connection", MB_OK | MB_ICONERROR);
+
             return 1;
         }
     }
@@ -105,7 +107,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 0;
         }
 
-
         //// send json to server
         //bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
         //if (bytesSent == SOCKET_ERROR)
@@ -120,7 +121,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //    }
         //    return 0;
         //}
-
         MSG msg;
 
         while (true)
@@ -131,9 +131,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
+
             //Logic
             //Render
         }
+
         // Cleanup
         closesocket(sock);
         WSACleanup();

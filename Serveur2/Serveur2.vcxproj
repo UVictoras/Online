@@ -133,12 +133,14 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameManagerS.h" />
+    <ClInclude Include="PlayerS.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Serveur2.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameManagerS.cpp" />
+    <ClCompile Include="PlayerS.cpp" />
     <ClCompile Include="Serveur2.cpp" />
   </ItemGroup>
   <ItemGroup>
