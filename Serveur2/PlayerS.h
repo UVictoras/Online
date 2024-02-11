@@ -1,7 +1,8 @@
 #pragma once
 
-#include <winsock2.h>
 #include <string>
+#define NOMINMAX
+#include <winsock2.h>
 
 class Player
 {

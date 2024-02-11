@@ -2,9 +2,9 @@
 #include "Math.h"
 #include <iostream>
 #include <sstream>
-
-#include <winsock2.h>
 #include <vector>
+#define NOMINMAX
+#include <winsock2.h>
 
 
 using json = nlohmann::json;
