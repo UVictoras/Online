@@ -119,7 +119,7 @@ void GameManager::PlaceSign()
 	{
         "grid", {0,0,0,0,0,0,0,0,0} 
 	};*/
-	std::string jtext = j.dump();
+	std::string jtext = j.dump() + "\n";
     // send json to server
     int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
     if (bytesSent == SOCKET_ERROR)
@@ -239,7 +239,7 @@ bool GameManager::IsFullGrid()
     return true;
 }
 
-void GameManager::GameLoop()
+void GameManager::GameLoop(SOCKET sock, HWND hWnd)
 {
 
     sf::Clock oClock;
@@ -275,6 +275,8 @@ void GameManager::GameLoop()
             }
 
         }
+
+        
 
         oWindow.display();
         fDeltaTime = oClock.restart().asSeconds();

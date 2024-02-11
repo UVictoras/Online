@@ -63,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("192.168.178.128"); // Écoute sur toutes les interfaces locales
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.1.16"); // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
@@ -81,16 +81,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         GameManager::Initialize(&sock); //Initializing GameManager's singleton instance
       
 
-        GameManager::Get()->GameLoop();
+        GameManager::Get()->GameLoop(sock,hWnd);
         std::string textj = GameManager::Get()->GetJson();
-        MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
+        //MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
 
         //MessageBoxW(hWnd, ("JSON to send: "+textj).c_str(), MB_OK | MB_ICONERROR);
 
         WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
-        const char* message = "Hello, server!";
+        const char* message = "NIQUE TOI!\n";
         int bytesSent = send(sock, message, strlen(message), 0);
         if (bytesSent == SOCKET_ERROR)
         {
@@ -104,6 +104,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
             return 0;
         }
+
 
         //// send json to server
         //bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);

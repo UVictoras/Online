@@ -63,7 +63,7 @@ public:
 	bool IsFullGrid();
 
 
-	void GameLoop();
+	void GameLoop(SOCKET sock,HWND hWnd);
 
 	//Events
 
