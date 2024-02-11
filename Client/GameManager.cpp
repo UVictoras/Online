@@ -54,11 +54,8 @@ GameManager::GameManager(SOCKET* input) : oWindow(sf::VideoMode(920, 920), "Cass
     m_pPlayers[1] = new Player('o');
 
     // create a JSON object
-    grid =
-    {
-        "grid", {0,0,0,0,0,0,0,0,0}
-    };
-    std::string textj = grid.dump();
+    
+    std::string textj;
 
     // std::stringstream box_message;
     // box_message << "UwU " << j;
@@ -109,6 +106,7 @@ void GameManager::PlaceSign()
                 // reset json and fill it with the cell player interacted with
                 j.clear();
                 j["cell"] = cCase->m_iIndex;
+                j["Name"] = "Test";
             }
         }
     }

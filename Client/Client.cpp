@@ -84,7 +84,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       
 
         GameManager::Get()->GameLoop(sock,hWnd);
-        std::string textj = GameManager::Get()->GetJson();
         //MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
 
@@ -202,6 +201,12 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    SOCKET sAccept, sInfoSocket;
+    WSABUF bBuffer;
+    char cBufferData[1024];
+    bBuffer.buf = cBufferData;
+    bBuffer.len = 1024;
+    DWORD wBytes, wFlags = 0;
     switch (message)
     {
         case WM_USER + 1:
@@ -210,6 +215,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 case FD_READ:
                 {
+                    sInfoSocket = wParam;
+                    if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
+                    {
+                        if (WSAGetLastError() != WSAEWOULDBLOCK)
+                        {
+                            MessageBox(hWnd, L"Notification failed", L"Notification Client", MB_OK | MB_ICONINFORMATION);
+                            closesocket(sInfoSocket);
+                            return 0;
+                        }
+                    }
+                    else
+                        MessageBox(hWnd, L"LE SERVEUR PARLE", L"Notification Client", MB_OK | MB_ICONINFORMATION);
                     break;
                 }
                 //case FD_WRITE:

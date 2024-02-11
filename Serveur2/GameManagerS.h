@@ -15,8 +15,8 @@ private:
 	static GameManager* pInstance;
 
 	bool m_bWon1, m_bWon2, m_bDraw;
-
-	json grid;
+	std::vector<int> m_iGrid;
+	json m_jServ;
 
 public:
 
@@ -42,7 +42,11 @@ public:
 
 	GameManager();
 
-	void AssignPlayer();
+	void AssignPlayer(json jClient, SOCKET* sSock);
+
+	void GameReady();
+
+	void SendJSON(bool GameRunnig, bool ValidMove, bool PlayerTurn, Player* pPlayer);
 
 	void ChangeTurn();
 
@@ -58,6 +62,6 @@ public:
 
 	void CloseWindow();
 
-	void PlaceSign(int jIndex, int jId);
+	void PlaceSign(json jClient);
 
 };
