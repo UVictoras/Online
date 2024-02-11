@@ -63,7 +63,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("192.168.178.128"); // Écoute sur toutes les interfaces locales
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.50.128"); // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
@@ -82,8 +82,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       
 
         GameManager::Get()->GameLoop();
-        std::string textj = GameManager::Get()->GetJson();
-        MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
 
 
         //MessageBoxW(hWnd, ("JSON to send: "+textj).c_str(), MB_OK | MB_ICONERROR);

@@ -175,8 +175,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 case FD_READ:
                 {
+                    std::cout << "Reading";
                     sInfoSocket = wParam;
-                    std::cout << &bBuffer.buf;
+                    //std::cout << &bBuffer.buf;
                     if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
                     {
                         if (WSAGetLastError() != WSAEWOULDBLOCK)
