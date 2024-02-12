@@ -1,5 +1,6 @@
 #pragma once
 
+#include <strsafe.h>
 #include <iostream>
 #define NOMINMAX
 #include <winsock2.h>
@@ -11,13 +12,17 @@ private:
 
 	HANDLE m_hThreadHandler;
 
+	static DWORD WINAPI Static_ThreadProc(LPVOID lpParameter);
+
 public:
 	int m_iFlags;
 
 	Thread();
 
-	virtual void Run();
+	void Run();
 
-	static DWORD WINAPI Static_ThreadProc(LPVOID lpParameter);
+	virtual void OnRun();
+
+	virtual void HandleError(LPCTSTR lpszFunction);
 };
 
