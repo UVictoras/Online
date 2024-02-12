@@ -75,7 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
         const char* message = "Hello, server!";
-        int bytesSent = send(sock, message, strlen(message), 0);
+        int bytesSent = send(sock, message, static_cast<int>(strlen(message)), 0);
         if (bytesSent == SOCKET_ERROR)
         {
             if (WSAGetLastError() != WSAEWOULDBLOCK)
@@ -202,7 +202,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (bBuffer.buf[0] != NULL) {
                     int i = 0;
                     std::string message;
-                    while (bBuffer.buf[i] != '\n' && i < bBuffer.len) {
+                    while (bBuffer.buf[i] != '\n' && i < static_cast<int>(bBuffer.len)) {
                         message += bBuffer.buf[i];
                         i++;
                     }
