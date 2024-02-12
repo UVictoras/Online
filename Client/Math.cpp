@@ -20,7 +20,7 @@ float Math::Rotate(GameObject* gGameObject, float vLocalPositionX, float vLocalP
 	return -atan2(vLocalPositionX - gGameObject->m_fX, vLocalPositionY - gGameObject->m_fY) * 180 / 3.14159;
 }
 
-bool Math::IsInsideInterval(int v, int vMin, int vMax)
+bool Math::IsInsideInterval(float v, float vMin, float vMax)
 {
 	return v >= vMin && v <= vMax;
 }

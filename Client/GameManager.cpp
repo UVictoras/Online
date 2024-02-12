@@ -81,7 +81,7 @@ void GameManager::SendJSON(int cell)
         m_jClient["Id"] = m_pPlayers->m_iId;
         std::string jtext = m_jClient.dump() + "\n";
         // send json to server
-        int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
+        int bytesSent = send(*sock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
         if (bytesSent == SOCKET_ERROR)
         {
             if (WSAGetLastError() != WSAEWOULDBLOCK)
@@ -97,9 +97,9 @@ void GameManager::PlaceSign()
 {
     for (Case* cCase : m_cCasesList)
     {
-        if (Math::IsInsideInterval(vLocalPosition.x, cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
+        if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.x), cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
         {
-            if (Math::IsInsideInterval(vLocalPosition.y, cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
+            if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.y), cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
             {
                 if (m_iTurn == m_pPlayers->m_iId)
                 {
@@ -120,9 +120,9 @@ void GameManager::UpdateGrid(json servJSON) {
             case 0:
                 m_gCasesBack[i] = nullptr;
             case 1:
-                m_gCasesBack[i] = new GameObject(false, i % 3 * (290 + 25), i / 3 * (290 + 25), 290, 290, sf::Color::White);
+                m_gCasesBack[i] = new GameObject(false, static_cast<float>(i % 3 * (290 + 25)) , static_cast<float>(i / 3 * (290 + 25)), 290.0, 290.0, sf::Color::White);
             case 2:
-                m_gCasesBack[i] = new GameObject(true, i + 290 / 2 - 100, i + 290 / 2 - 100, 200, 200, sf::Color::Red);
+                m_gCasesBack[i] = new GameObject(true, static_cast<float>(i + 290 / 2 - 100), static_cast<float>(i + 290 / 2 - 100), 200.0, 200.0, sf::Color::Red);
             default:
                 break;
             }
@@ -137,7 +137,7 @@ void GameManager::CreateGrid()
 
     for (int i = 0; i < 9; i++)
     {
-        m_cCasesList[i] = new Case(true, i % 3 * (290 + 25), i / 3 * (290 + 25), i, 290, 290, sf::Color::Black, m_tTextureBlank);
+        m_cCasesList[i] = new Case(true, static_cast<float>(i % 3 * (290 + 25)), static_cast<float>(i / 3 * (290 + 25)), i, 290, 290, sf::Color::Black, m_tTextureBlank);
     }
 }
 

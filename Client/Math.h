@@ -7,5 +7,5 @@ namespace Math
 
 	float Rotate(GameObject* gGameObject, float vLocalPositionX, float vLocalPositionY);
 
-	bool IsInsideInterval(int v, int vMin, int vMax);
+	bool IsInsideInterval(float v, float vMin, float vMax);
 };
