@@ -59,14 +59,15 @@ void GameManager::PlaceSign(json jClient) {
     SendJSON(true, false);
 }
 
-void GameManager::GameReady() {
+bool GameManager::GameReady() {
     for (Player* pPlayer : m_pPlayers) {
         if (pPlayer->m_sSock == NULL) {
             SendJSON(false, false);
-            return;
+            return false;
         }
     }
     SendJSON(true, false);
+    return true;
 }
 
 void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {

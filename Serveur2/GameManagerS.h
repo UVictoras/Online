@@ -44,7 +44,7 @@ public:
 
 	void AssignPlayer(json jClient, SOCKET* sSock);
 
-	void GameReady();
+	bool GameReady();
 
 	void SendJSON(bool GameRunnig, bool ValidMove);
 

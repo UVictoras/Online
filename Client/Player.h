@@ -1,13 +1,13 @@
 #pragma once
-#include "Case.h";
+#include <string>
 
 class Player
 {
 public:
-	char m_sName;
+	std::string m_sName;
 	int m_iId;
 
 	Player();
 
-	void MakePlay(Case* cCase, int* iTurn, sf::Texture* tTextureX, sf::Texture* tTextureCircle);
+	void ChangeName(std::string sName);
 };

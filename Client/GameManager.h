@@ -19,9 +19,9 @@ private:
 
 	sf::RenderWindow oWindow;
 
-	bool m_bWon1, m_bWon2, m_bDraw;
+	bool m_bWon1, m_bWon2, m_bDraw, GameRunning;
 
-	json grid ; 
+	json m_jClient ; 
 
 public:
 
@@ -53,6 +53,8 @@ public:
 
 	GameManager(SOCKET* input);
 
+	void SendJSON(int cell);
+
 	void CreateGrid();
 
 	void CreateSign();
@@ -65,8 +67,9 @@ public:
 
 	// FAUT CREER LA FONCTION POUR RECUP LA REPONSE DU SERV, ET ASSIGNER L'ID DU JOUEUR
 	// CREER LA FONCTION POUR RECUPERER LA REPONSE DU SERV APRES AVOIR CLIQUER ET SI LE COUP EST VALIDE ON AFFICHE
+	void GetName();
 
-	void GameLoop(SOCKET sock,HWND hWnd);
+	void GameLoop(SOCKET* sock,HWND hWnd);
 
 	//Events
 
