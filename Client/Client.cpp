@@ -54,12 +54,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Écoute sur toutes les interfaces locales
+    serverAddr.sin_addr.s_addr = inet_addr("10.1.144.35"); // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
         int error = WSAGetLastError();
         if (error != WSAEWOULDBLOCK) {
+            MessageBox(hWnd, L"Connection to the server failed", L"Connection Error", MB_OK | MB_ICONERROR);
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
@@ -98,9 +99,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
-
-
-
             //Logic
             //Render
         }
