@@ -172,6 +172,12 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    SOCKET sAccept, sInfoSocket;
+    WSABUF bBuffer;
+    char cBufferData[1024];
+    bBuffer.buf = cBufferData;
+    bBuffer.len = 1024;
+    DWORD wBytes, wFlags = 0;
     switch (message)
     {
     case WM_USER + 1:
@@ -180,6 +186,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case FD_READ:
         {
+            sInfoSocket = wParam;
+            if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
+            {
+                if (WSAGetLastError() != WSAEWOULDBLOCK)
+                {
+                    MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONINFORMATION);
+                    closesocket(sInfoSocket);
+                    return 0;
+                }
+            }
+            else
+            {
+                // turn buffer message into json
+                if (bBuffer.buf[0] != NULL) {
+                    int i = 0;
+                    std::string message;
+                    while (bBuffer.buf[i] != '\n' && i < bBuffer.len) {
+                        message += bBuffer.buf[i];
+                        i++;
+                    }
+                    json j = json::parse(message);
+                    bBuffer.buf = nullptr;
+                    bBuffer.buf = cBufferData;
+                }
+            }
             break;
         }
         //case FD_WRITE:

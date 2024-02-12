@@ -36,17 +36,21 @@ public:
 
 	int m_iTurn;
 
+	json m_jClient;
+
 	vector<Player*> m_pPlayers;
 
 	vector<int> m_Grid;
 
 	GameManager();
 
-	void AssignPlayer(json jClient, SOCKET* sSock);
+	void AssignPlayer(SOCKET* sSock);
 
 	bool GameReady();
 
 	void SendJSON(bool GameRunnig, bool ValidMove);
+
+	void GetJSON(json jClient);
 
 	void ChangeTurn();
 

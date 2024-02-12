@@ -33,24 +33,26 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
 
     m_Grid = { 0,0,0,0,0,0,0,0,0 };
     m_jServ["Grid"] = m_Grid;
+    m_jClient["Name"] = " ";
 }
 
-void GameManager::AssignPlayer(json jClient, SOCKET* sSock) {
+void GameManager::AssignPlayer(SOCKET* sSock) {
     if (m_pPlayers[0]->m_sSock == NULL) {
-        m_pPlayers[0]->m_sName = jClient["Name"];
+        m_pPlayers[0]->m_sName = m_jClient["Name"];
         m_pPlayers[0]->m_sSock = *sSock;
+        std::cout << m_pPlayers[0]->m_sName << std::endl;
     }
     else if (m_pPlayers[1]->m_sSock == NULL) {
-        m_pPlayers[1]->m_sName = jClient["Name"];
+        m_pPlayers[1]->m_sName = m_jClient["Name"];
         m_pPlayers[1]->m_sSock = *sSock;
     }
 }
 
-void GameManager::PlaceSign(json jClient) {
-    if (m_Grid[jClient["Cell"]] == 0) {
-        if (m_pPlayers[m_iTurn]->m_sId == jClient["Id"])
+void GameManager::PlaceSign(json m_jClient) {
+    if (m_Grid[m_jClient["Cell"]] == 0) {
+        if (m_pPlayers[m_iTurn]->m_sId == m_jClient["Id"])
         {
-            m_Grid[jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
+            m_Grid[m_jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
             ChangeTurn();
             SendJSON(true, true);
             return;
@@ -90,6 +92,8 @@ void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
     }
    
 }
+
+void GameManager::GetJSON(json jClient) { m_jClient = jClient; }
 
 void GameManager::ChangeTurn() {
     if (m_iTurn)

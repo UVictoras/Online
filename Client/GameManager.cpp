@@ -105,23 +105,27 @@ void GameManager::PlaceSign()
                 {
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
                         SendJSON(cCase->m_iIndex);
-                        m_iTurn++;
                     }
                 }
                 // reset json and fill it with the cell player interacted with
             }
         }
     }
+}
 
-    std::string jtext = jClient.dump() + "\n";
-    // send json to server
-    int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
-    if (bytesSent == SOCKET_ERROR)
-    {
-        if (WSAGetLastError() != WSAEWOULDBLOCK)
-        {
-            closesocket(*sock);
-            WSACleanup();
+void GameManager::UpdateGrid(json servJSON) {
+    if (servJSON["ValidMove"]) {
+        for (int i = 0; i < 9; i++) {
+            switch (int(servJSON["Grid"][i])) {
+            case 0:
+                m_gCasesBack[i] = nullptr;
+            case 1:
+                m_gCasesBack[i] = new GameObject(false, i % 3 * (290 + 25), i / 3 * (290 + 25), 290, 290, sf::Color::White);
+            case 2:
+                m_gCasesBack[i] = new GameObject(true, i + 290 / 2 - 100, i + 290 / 2 - 100, 200, 200, sf::Color::Red);
+            default:
+                break;
+            }
         }
     }
 }

@@ -33,31 +33,15 @@ int main()
 {
 //    UNREFERENCED_PARAMETER(hPrevInstance);
 //    UNREFERENCED_PARAMETER(lpCmdLine);
-
+    json clientJSON;
     // TODO: Placez le code ici.
-    HINSTANCE hInstance = GetModuleHandleA(0);
-	GameManager::Initialize();
-    // Initialise les chaînes globales
-    MyRegisterClass(hInstance);
-
-    // Effectue l'initialisation de l'application :
-    hWnd = InitInstance(hInstance, 0);
-
-    if (hWnd == NULL) {
-        return 1;
-    }
-    // Initialisation de Winsock
-    WSAData wsaData;
-    WORD version = MAKEWORD(2, 2);
-    if (WSAStartup(version, &wsaData) != 0) {
-        return 1;
-    }
+   
 
     // Création du socket pour écouter les connexions entrantes
-    std::vector<SOCKET*> sockVect;
     SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenSocket == INVALID_SOCKET) {
         WSACleanup();
+		MessageBox(hWnd, L"listenSocket is invalid", L"Error", MB_OK | MB_ICONERROR);
         return 1;
     }
 
@@ -68,8 +52,11 @@ int main()
     serverAddr.sin_addr.s_addr = INADDR_ANY; // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
     if (bind(listenSocket, (const sockaddr*)&serverAddr, (int)sizeof(serverAddr)) == SOCKET_ERROR) {
+        int errorCode = WSAGetLastError();
         closesocket(listenSocket);
         WSACleanup();
+		MessageBox(hWnd, L"Couldn't link listenSocket to serverAddr. Error code: "+errorCode, L"Error", MB_OK | MB_ICONERROR);
+		//MessageBox(hWnd, L"Couldn't link listenSocket to serverAddr.", L"Error", MB_OK | MB_ICONERROR);
         return 1;
     }
 
@@ -77,14 +64,18 @@ int main()
     if (listen(listenSocket, 0) == SOCKET_ERROR) {
         closesocket(listenSocket);
         WSACleanup();
+		MessageBox(hWnd, L"Couldn't listen on listenSocket", L"Error", MB_OK | MB_ICONERROR);
         return 1;
     }
 
     WSAAsyncSelect(listenSocket, hWnd, WM_USER + 1, FD_ACCEPT);
-    sockVect.push_back(&listenSocket);
+
+	while (GameManager::Get()->GameReady() == false)
+	{
+		GameManager::Get()->AssignPlayer(&listenSocket);
+	}
 
     MSG msg;
-
 
     // Boucle de messages principale :
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -92,16 +83,7 @@ int main()
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    for (SOCKET* socket : sockVect) {
-        WSAAsyncSelect(*socket, hWnd, WM_USER + 1, FD_READ);
-    }
-
-	nlohmann::json jSon;
-	while (GameManager::Get()->GameReady() == false)
-	{
-		GameManager::Get()->AssignPlayer(jSon, &listenSocket);
-	}
-
+    
     return (int) msg.wParam;
 }
 
@@ -190,7 +172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 if (WSAGetLastError() != WSAEWOULDBLOCK)
                 {
-                    MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONINFORMATION);
+                    MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONERROR);
                     closesocket(sInfoSocket);
                     return 0;
                 }
@@ -207,6 +189,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     json j = json::parse(message);
                     bBuffer.buf = nullptr;
                     bBuffer.buf = cBufferData;
+                    GameManager::Get()->GetJSON(j);
                 }
             }
             break;
