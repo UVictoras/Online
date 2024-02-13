@@ -37,15 +37,16 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
 }
 
 void GameManager::AssignPlayer(SOCKET sSock) {
-    if (m_pPlayers[0]->m_sSock == NULL && m_pPlayers[1]->m_sSock != sSock) {
+    //std::cout << "CONDITION: " << (m_pPlayers[0]->m_sSock != sSock) << std::endl;
+    if (m_pPlayers[0]->m_sSock == NULL && m_pPlayers[1]->m_sSock != sSock && m_jClient["Name"] != " ") {
         m_pPlayers[0]->m_sName = m_jClient["Name"];
         m_pPlayers[0]->m_sSock = sSock;
-        std::cout << m_pPlayers[0]->m_sName << std::endl;
+        std::cout << "p1: " << m_pPlayers[0]->m_sName << " sock: " << m_pPlayers[0]->m_sSock << std::endl;
     }
-    else if (m_pPlayers[1]->m_sSock == NULL && m_pPlayers[0]->m_sSock != sSock) {
+    else if (m_pPlayers[1]->m_sSock == NULL && m_pPlayers[0]->m_sSock != sSock && m_jClient["Name"] != " " && m_pPlayers[0]->m_sSock != NULL) {
         m_pPlayers[1]->m_sName = m_jClient["Name"];
         m_pPlayers[1]->m_sSock = sSock;
-		std::cout << m_pPlayers[1]->m_sName << std::endl;
+        std::cout << "p2: " << m_pPlayers[1]->m_sName << " sock: " << m_pPlayers[1]->m_sSock << std::endl;
     }
 }
 
@@ -65,7 +66,6 @@ void GameManager::PlaceSign(json m_jClient) {
 bool GameManager::GameReady() {
     for (Player* pPlayer : m_pPlayers) {
         if (pPlayer->m_sSock == NULL) {
-            SendJSON(false, false);
             return false;
         }
     }
@@ -95,7 +95,7 @@ void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
    
 }
 
-void GameManager::GetJSON(json jClient) { m_jClient = jClient; }
+void GameManager::GetJSON(json jClient) { m_jClient = jClient;}
 
 void GameManager::ChangeTurn() {
     if (m_iTurn)
