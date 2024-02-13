@@ -36,15 +36,16 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
     m_jClient["Name"] = " ";
 }
 
-void GameManager::AssignPlayer(SOCKET* sSock) {
-    if (m_pPlayers[0]->m_sSock == NULL) {
+void GameManager::AssignPlayer(SOCKET sSock) {
+    if (m_pPlayers[0]->m_sSock == NULL && m_pPlayers[1]->m_sSock != sSock) {
         m_pPlayers[0]->m_sName = m_jClient["Name"];
-        m_pPlayers[0]->m_sSock = *sSock;
+        m_pPlayers[0]->m_sSock = sSock;
         std::cout << m_pPlayers[0]->m_sName << std::endl;
     }
-    else if (m_pPlayers[1]->m_sSock == NULL) {
+    else if (m_pPlayers[1]->m_sSock == NULL && m_pPlayers[0]->m_sSock != sSock) {
         m_pPlayers[1]->m_sName = m_jClient["Name"];
-        m_pPlayers[1]->m_sSock = *sSock;
+        m_pPlayers[1]->m_sSock = sSock;
+		std::cout << m_pPlayers[1]->m_sName << std::endl;
     }
 }
 
@@ -68,6 +69,7 @@ bool GameManager::GameReady() {
             return false;
         }
     }
+
     SendJSON(true, false);
     return true;
 }

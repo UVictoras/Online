@@ -44,7 +44,7 @@ public:
 
 	GameManager();
 
-	void AssignPlayer(SOCKET* sSock);
+	void AssignPlayer(SOCKET sSock);
 
 	bool GameReady();
 

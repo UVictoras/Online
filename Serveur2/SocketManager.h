@@ -18,10 +18,15 @@ private:
 	static SocketManager* sInstance;
 
 public:
+	std::vector<SOCKET*> vSockets;
 
     static void Initialize();
 	static SocketManager* Get() {
 		return sInstance;
+	}
+	static SOCKET GetSocket()
+	{
+		return SocketManager::Get()->listenSocket;
 	}
 
 	SocketManager();

@@ -3,9 +3,9 @@
 #include "framework.h"
 #pragma comment(lib, "ws2_32.lib")
 
-#define PORT 82
+#define PORT 99                          
 #define MAX_LOADSTRING 100
-#define BUFFER_SIZE 1024 // Taille du tampon de lecture
+#define BUFFER_SIZE 1024 // Taille du tampon de lecture 
 
 using json = nlohmann::json;
 
@@ -25,11 +25,11 @@ SocketManager* SocketManager::sInstance = nullptr;
 
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-	hInst = hInstance; // Stocke le handle d'instance dans la variable globale
+    hInst = hInstance; // Stocke le handle d'instance dans la variable globale
 
-	HWND hWnd = CreateWindowW(L"Window", L"", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-	return hWnd;
+    HWND hWnd = CreateWindowW(L"Window", L"", WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    return hWnd;
 }
 
 void SocketManager::Initialize() {
@@ -102,8 +102,10 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
             sInfoSocket = wParam;
             if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
             {
+                
                 if (WSAGetLastError() != WSAEWOULDBLOCK)
                 {
+                    string msg = "Notification failed. Error code ";
                     MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONERROR);
                     closesocket(sInfoSocket);
                     return 0;
@@ -144,44 +146,43 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
 
 void SocketManager::Accept() {
-    // Création du socket pour écouter les connexions entrantes
-    listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (listenSocket == INVALID_SOCKET) {
-        WSACleanup();
-        MessageBox(hWnd, L"listenSocket is invalid", L"Error", MB_OK | MB_ICONERROR);
-        return;
-    }
+	// Création du socket pour écouter les connexions entrantes
+	listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (listenSocket == INVALID_SOCKET) {
+		MessageBox(hWnd, L"listenSocket is invalid", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 
-    // Liaison du socket à l'adresse locale et au port
-    sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY; // Écoute sur toutes les interfaces locales
-    serverAddr.sin_port = htons(PORT); // Port d'écoute
-    if (bind(listenSocket, (const sockaddr*)&serverAddr, (int)sizeof(serverAddr)) == SOCKET_ERROR) {
-        int errorCode = WSAGetLastError();
-        closesocket(listenSocket);
-        WSACleanup();
-        MessageBox(hWnd, L"Couldn't link listenSocket to serverAddr. Error code: " + errorCode, L"Error", MB_OK | MB_ICONERROR);
-        return;
-    }
+	// Liaison du socket à l'adresse locale et au port
+	sockaddr_in serverAddr;	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = INADDR_ANY; // Écoute sur toutes les interfaces locales
+	serverAddr.sin_port = htons(PORT); // Port d'écoute
+	if (bind(listenSocket, (const sockaddr*)&serverAddr, (int)sizeof(serverAddr)) == SOCKET_ERROR) {
+		int errorCode = WSAGetLastError();
+		closesocket(listenSocket);
+		MessageBox(hWnd, L"Couldn't link listenSocket to serverAddr. Error code: " + errorCode, L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 
-    // Mettre le socket en mode écoute
-    if (listen(listenSocket, 0) == SOCKET_ERROR) {
-        closesocket(listenSocket);
-        WSACleanup();
-        MessageBox(hWnd, L"Couldn't listen on listenSocket", L"Error", MB_OK | MB_ICONERROR);
-        return;
-    }
+	// Mettre le socket en mode écoute
+	if (listen(listenSocket, 0) == SOCKET_ERROR) {
+		closesocket(listenSocket);
+		MessageBox(hWnd, L"Couldn't listen on listenSocket", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
 
-    WSAAsyncSelect(listenSocket, hWnd, WM_USER + 1, FD_ACCEPT);
+	WSAAsyncSelect(listenSocket, hWnd, WM_USER + 1, FD_ACCEPT);
 }
 
 void SocketManager::Read() {
     MSG msg;
     // Boucle de messages principale :
-    while (GetMessage(&msg, nullptr, 0, 0)) {
+    while (GetMessage(&msg, nullptr, 0, 0)) {;
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+        if (GameManager::Get()->GameReady() == false){
+            GameManager::Get()->AssignPlayer(listenSocket);
+        }
     }
 }
 

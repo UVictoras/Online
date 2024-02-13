@@ -5,10 +5,27 @@
 #include "Client.h"
 #include <winsock2.h>
 #include <iostream>
+#include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
+#include <codecvt>
+#include <locale>
+
+//function to convert str to wstring and the other way around
+using convert_t = std::codecvt_utf8<wchar_t>;
+std::wstring_convert<convert_t, wchar_t> strconverter;
+
+std::string to_string(std::wstring wstr)
+{
+	return strconverter.to_bytes(wstr);
+}
+std::wstring to_wstring(std::string str)
+{
+	return strconverter.from_bytes(str);
+}
+
 #define MAX_LOADSTRING 100
-#define PORT 82
+#define PORT 99
 
 // Variables globales :
 HINSTANCE hInst;                                // instance actuelle
@@ -54,12 +71,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Écoute sur toutes les interfaces locales
+   // serverAddr.sin_addr.s_addr = inet_addr("10.1.144.36"); // Écoute sur toutes les interfaces locales
+    //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Écoute sur toutes les interfaces locales
+    InetPton(AF_INET, L"127.0.0.1", &serverAddr.sin_addr.s_addr);
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
-    if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
-        int error = WSAGetLastError();
+    //if (WSAConnect(sock, (const sockaddr*)(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
+    if (connect(sock, (const sockaddr*)(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR) {
+            int error = WSAGetLastError();
         if (error != WSAEWOULDBLOCK) {
+			MessageBox(hWnd, L"Connection error", L"Error", MB_OK | MB_ICONQUESTION);
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
