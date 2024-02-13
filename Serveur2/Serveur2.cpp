@@ -1,14 +1,12 @@
 // Serveur2.cpp : Définit le point d'entrée de l'application.
 //
 
+#include "GameManagerS.h"
 #include "framework.h"
 #include "Serveur2.h"
 #include <iostream>
-#include <vector>
 #include <string>
 #include "../json-develop/single_include/nlohmann/json.hpp"
-#define NOMINMAX
-#include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")
 
 using json = nlohmann::json;
@@ -38,6 +36,7 @@ int main()
 
     // TODO: Placez le code ici.
     HINSTANCE hInstance = GetModuleHandleA(0);
+	GameManager::Initialize();
     // Initialise les chaînes globales
     MyRegisterClass(hInstance);
 
@@ -68,7 +67,7 @@ int main()
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY; // Écoute sur toutes les interfaces locales
     serverAddr.sin_port = htons(PORT); // Port d'écoute
-    if (bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+    if (bind(listenSocket, (const sockaddr*)&serverAddr, (int)sizeof(serverAddr)) == SOCKET_ERROR) {
         closesocket(listenSocket);
         WSACleanup();
         return 1;
@@ -86,6 +85,7 @@ int main()
 
     MSG msg;
 
+
     // Boucle de messages principale :
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -95,10 +95,12 @@ int main()
     for (SOCKET* socket : sockVect) {
         WSAAsyncSelect(*socket, hWnd, WM_USER + 1, FD_READ);
     }
-    bool stop = false;
-    while (!stop) {
 
-    }
+	nlohmann::json jSon;
+	while (GameManager::Get()->GameReady() == false)
+	{
+		GameManager::Get()->AssignPlayer(jSon, &listenSocket);
+	}
 
     return (int) msg.wParam;
 }
@@ -198,7 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (bBuffer.buf[0] != NULL) {
                     int i = 0;
                     std::string message;
-                    while (bBuffer.buf[i] != '\n' and i < bBuffer.len) {
+                    while (bBuffer.buf[i] != '\n' && i < bBuffer.len) {
                         message += bBuffer.buf[i];
                         i++;
                     }

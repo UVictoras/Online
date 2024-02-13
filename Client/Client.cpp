@@ -1,35 +1,25 @@
-// Client.cpp : DÃ©finit le point d'entrÃ©e de l'application.
+// Client.cpp : Définit le point d'entrée de l'application.
 //
 
 #include "framework.h"
 #include "Client.h"
-#include <iostream>
-#include <sstream>
-#define NOMINMAX
 #include <winsock2.h>
+#include <iostream>
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
 #define PORT 82
 
-// Variables globalesÂ :
+// Variables globales :
 HINSTANCE hInst;                                // instance actuelle
 WCHAR szTitle[MAX_LOADSTRING];                  // Texte de la barre de titre
-WCHAR szWindowClass[MAX_LOADSTRING];            // nom de la classe de fenÃªtre principale
+WCHAR szWindowClass[MAX_LOADSTRING];            // nom de la classe de fenêtre principale
 
-// DÃ©clarations anticipÃ©es des fonctions incluses dans ce module de codeÂ :
+// Déclarations anticipées des fonctions incluses dans ce module de code :
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-// MessageBox for variables
-#define MSGBOX(x) \
-{ \
-   std::ostringstream oss; \
-   oss << x; \
-   MessageBox(oss.str().c_str(), "Msg Title", MB_OK | MB_ICONQUESTION); \
-} // ex: MSGBOX("text"<<variable);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -41,10 +31,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // TODO: Placez le code ici.
 
-    // Initialise les chaÃ®nes globales
+    // Initialise les chaînes globales
     MyRegisterClass(hInstance);
 
-    // Effectue l'initialisation de l'applicationÂ :
+    // Effectue l'initialisation de l'application :
     HWND hWnd = InitInstance(hInstance, nCmdShow);
 
     // Initialisation de Winsock
@@ -54,44 +44,38 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return 1;
     }
 
-    // CrÃ©ation du socket pour Ã©couter les connexions entrantes
+    // Création du socket pour écouter les connexions entrantes
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
         WSACleanup();
         return 1;
     }
 
-    // Liaison du socket Ã  l'adresse locale et au port
+    // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Ã‰coute sur toutes les interfaces locales
-    serverAddr.sin_port = htons(PORT); // Port d'Ã©coute
+    serverAddr.sin_addr.s_addr = inet_addr("10.1.144.35"); // Écoute sur toutes les interfaces locales
+    serverAddr.sin_port = htons(PORT); // Port d'écoute
 
     if (WSAConnect(sock, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
         int error = WSAGetLastError();
         if (error != WSAEWOULDBLOCK) {
+            MessageBox(hWnd, L"Connection to the server failed", L"Connection Error", MB_OK | MB_ICONERROR);
             closesocket(sock);
             DestroyWindow(hWnd);
             WSACleanup();
-          
-			MessageBox(hWnd, L"La connection au serveur a echoue.", L"Erreur de connection", MB_OK | MB_ICONERROR);
-
             return 1;
         }
     }
-    else {
+    else 
         EventManager::Initialize();
         GameManager::Initialize(&sock); //Initializing GameManager's singleton instance
-      
-        GameManager::Get()->GameLoop(sock, hWnd);
-        //MessageBox(hWnd, L"Got JSON", L"HI", MB_OK | MB_ICONERROR);
-
-
-        //MessageBoxW(hWnd, ("JSON to send: "+textj).c_str(), MB_OK | MB_ICONERROR);
+        GameManager::Get()->GetName();
+        GameManager::Get()->GameLoop(&sock,hWnd);
 
         WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
 
-        const char* message = "NIQUE TOI!\n";
+        const char* message = "Hello, server!";
         int bytesSent = send(sock, message, strlen(message), 0);
         if (bytesSent == SOCKET_ERROR)
         {
@@ -100,37 +84,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 closesocket(sock);
                 WSACleanup();
                 DestroyWindow(hWnd);
-                MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
                 return 1;
             }
             return 0;
         }
 
-        //// send json to server
-        //bytesSent = send(sock, textj.c_str(), strlen(textj.c_str()), 0);
-        //if (bytesSent == SOCKET_ERROR)
-        //{
-        //    if (WSAGetLastError() != WSAEWOULDBLOCK)
-        //    {
-        //        closesocket(sock);
-        //        WSACleanup();
-        //        DestroyWindow(hWnd);
-        //        MessageBox(hWnd, L"Send error.", L"Error", MB_OK | MB_ICONERROR);
-        //        return 1;
-        //    }
-        //    return 0;
-        //}
         MSG msg;
 
         while (true)
         {
-            // Boucle de messages principaleÂ :
+            // Boucle de messages principale :
             while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-            {   
+            {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
-
             //Logic
             //Render
         }
@@ -141,13 +109,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         DestroyWindow(hWnd);
         return (int)msg.wParam;
     }
-}
+
+
 
 
 //
-//  FONCTIONÂ : MyRegisterClass()
+//  FONCTION : MyRegisterClass()
 //
-//  OBJECTIFÂ : Inscrit la classe de fenÃªtre.
+//  OBJECTIF : Inscrit la classe de fenêtre.
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
@@ -171,14 +140,14 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 }
 
 //
-//   FONCTIONÂ : InitInstance(HINSTANCE, int)
+//   FONCTION : InitInstance(HINSTANCE, int)
 //
-//   OBJECTIFÂ : enregistre le handle d'instance et crÃ©e une fenÃªtre principale
+//   OBJECTIF : enregistre le handle d'instance et crée une fenêtre principale
 //
-//   COMMENTAIRESÂ :
+//   COMMENTAIRES :
 //
 //        Dans cette fonction, nous enregistrons le handle de l'instance dans une variable globale, puis
-//        nous crÃ©ons et affichons la fenÃªtre principale du programme.
+//        nous créons et affichons la fenêtre principale du programme.
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
@@ -190,78 +159,60 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 //
-//  FONCTIONÂ : WndProc(HWND, UINT, WPARAM, LPARAM)
+//  FONCTION : WndProc(HWND, UINT, WPARAM, LPARAM)
 //
-//  OBJECTIFÂ : Traite les messages pour la fenÃªtre principale.
+//  OBJECTIF : Traite les messages pour la fenêtre principale.
 //
 //  WM_COMMAND  - traite le menu de l'application
-//  WM_PAINT    - Dessine la fenÃªtre principale
-//  WM_DESTROY  - gÃ©nÃ¨re un message d'arrÃªt et retourne
+//  WM_PAINT    - Dessine la fenêtre principale
+//  WM_DESTROY  - génère un message d'arrêt et retourne
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    SOCKET sAccept, sInfoSocket;
-    WSABUF bBuffer;
-    char cBufferData[1024];
-    bBuffer.buf = cBufferData;
-    bBuffer.len = 1024;
-    DWORD wBytes, wFlags = 0;
     switch (message)
     {
-        case WM_USER + 1:
+    case WM_USER + 1:
+    {
+        switch (WSAGETSELECTEVENT(lParam))
         {
-            switch (WSAGETSELECTEVENT(lParam))
-            {
-                case FD_READ:
-                {
-                    sInfoSocket = wParam;
-                    if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
-                    {
-                        if (WSAGetLastError() != WSAEWOULDBLOCK)
-                        {
-                            MessageBox(hWnd, L"Notification failed", L"Notification Client", MB_OK | MB_ICONINFORMATION);
-                            closesocket(sInfoSocket);
-                            return 0;
-                        }
-                    }
-                    else
-                        MessageBox(hWnd, L"LE SERVEUR PARLE", L"Notification Client", MB_OK | MB_ICONINFORMATION);
-                    break;
-                }
-                //case FD_WRITE:
-                //{
-                //    sInfoSocket = wParam;
-                //    // WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL)
-                //    // send(sInfoSocket, message, strlen(message), 0)
-                //    const char* message = "Hello, server!";
-                //    MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
-
-                //    if (WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL) == SOCKET_ERROR)
-                //    {
-                //        if (WSAGetLastError() != WSAEWOULDBLOCK)
-                //        {
-                //            closesocket(sInfoSocket);
-                //            return 0;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
-                //    }
-                //    break;
-                //}
-                case FD_CLOSE:
-                {
-                    break;
-                }
-            }
-        }
-        case WM_DESTROY:
-            PostQuitMessage(0);
+        case FD_READ:
+        {
             break;
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+        //case FD_WRITE:
+        //{
+        //    sInfoSocket = wParam;
+        //    // WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL)
+        //    // send(sInfoSocket, message, strlen(message), 0)
+        //    const char* message = "Hello, server!";
+        //    MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
+
+        //    if (WSASend(sInfoSocket, &bBuffer, 1, &wBytes, wFlags, NULL, NULL) == SOCKET_ERROR)
+        //    {
+        //        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        //        {
+        //            closesocket(sInfoSocket);
+        //            return 0;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox(hWnd, L"Message Sent", L"Notification", MB_OK | MB_ICONINFORMATION);
+        //    }
+        //    break;
+        //}
+        case FD_CLOSE:
+        {
+            break;
+        }
+        }
+    }
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
 }

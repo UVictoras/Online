@@ -6,7 +6,6 @@
 #define NOMINMAX
 #include <winsock2.h>
 
-
 using json = nlohmann::json;
 using namespace std;
 sf::Event pressed;
@@ -74,6 +73,26 @@ void GameManager::CloseWindow()
     oWindow.close();
 }
 
+void GameManager::SendJSON(int cell)  
+{
+        jClient.clear();
+        m_jClient["Name"] = m_pPlayers->m_sName;
+        m_jClient["Cell"] = cell;
+        m_jClient["Id"] = m_pPlayers->m_iId;
+        std::string jtext = m_jClient.dump() + "\n";
+        // send json to server
+        int bytesSent = send(*sock, jtext.c_str(), strlen(jtext.c_str()), 0);
+        if (bytesSent == SOCKET_ERROR)
+        {
+            if (WSAGetLastError() != WSAEWOULDBLOCK)
+            {
+                closesocket(*sock);
+                WSACleanup();
+            }
+        }
+    }
+
+
 void GameManager::PlaceSign()
 {
     for (Case* cCase : m_cCasesList)
@@ -85,10 +104,7 @@ void GameManager::PlaceSign()
                 if (m_iTurn == m_pPlayers->m_iId)
                 {
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
-                        jClient.clear();
-                        jClient["Cell"] = cCase->m_iIndex;
-                        jClient["Name"] = m_pPlayers->m_sName;
-                        jClient["Id"] = m_pPlayers->m_iId;
+                        SendJSON(cCase->m_iIndex);
                         m_iTurn++;
                     }
                 }
@@ -206,7 +222,60 @@ bool GameManager::IsFullGrid()
     return true;
 }
 
-void GameManager::GameLoop(SOCKET sock, HWND hWnd)
+void GameManager::GetName() {
+    // EventManager::Get()->AddComponent(sf::Event::EventType::KeyPressed, sf::Keyboard::Key::Enter, &EventCloseWindow);
+    sf::RenderWindow window(sf::VideoMode(400, 200), "Entrer le nom d'utilisateur");
+
+    sf::Font font;
+    if (!font.loadFromFile("srcs/font/Roboto-Black.ttf")) {
+        return;
+    }
+
+    sf::Text instruction("Entrez votre nom d'utilisateur :", font, 20);
+    instruction.setPosition(10, 10);
+
+    sf::Text inputText("", font, 20);
+    inputText.setPosition(10, 50);
+
+    std::string username;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+            else if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode < 128) {
+                    char enteredChar = char(event.text.unicode);
+                    if (enteredChar == '\b' && !username.empty()) {
+                        // Backspace : supprimer le dernier caractère
+                        username.pop_back();
+                    }
+                    else if (enteredChar != '\b') {
+                        // Ajouter le caractère à la chaîne du nom d'utilisateur
+                        username += enteredChar;
+                    }
+
+                }
+                // Mettre à jour le texte affiché
+                inputText.setString(username);
+            }
+            // Vérifier si la touche Entrée est pressée
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return)
+                window.close();
+        }
+
+        window.clear();
+        window.draw(instruction);
+        window.draw(inputText);
+        window.display();
+    }
+    m_pPlayers->ChangeName(username);
+    SendJSON(-1);
+}
+
+void GameManager::GameLoop(SOCKET* sock, HWND hWnd)
 {
 
     sf::Clock oClock;

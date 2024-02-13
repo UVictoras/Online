@@ -2,14 +2,11 @@
 
 Player::Player()
 {
-	m_sName = ' ';
+	m_sName = " ";
 	m_iId = -1;
 }
 
-void Player::MakePlay(Case* cCase, int* iTurn, sf::Texture* tTextureX, sf::Texture* tTextureCircle)
-{
-	if (cCase->m_bIsFull == true)
-		return;
 
-	iTurn++;
+void Player::ChangeName(std::string sName) {
+	m_sName = sName;
 }
