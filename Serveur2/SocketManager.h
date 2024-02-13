@@ -10,19 +10,21 @@
 class SocketManager
 {
 private:
-	SocketManager();
+
 	~SocketManager();
 
 	SOCKET listenSocket;
 
-	static SocketManager* pInstance;
+	static SocketManager* sInstance;
 
 public:
-	static void Initialize();
+
+    static void Initialize();
 	static SocketManager* Get() {
-		return pInstance;
+		return sInstance;
 	}
 
+	SocketManager();
 
 	static ATOM MyRegisterClass(HINSTANCE hInstance);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

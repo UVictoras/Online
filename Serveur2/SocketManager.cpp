@@ -3,13 +3,11 @@
 #include "framework.h"
 #pragma comment(lib, "ws2_32.lib")
 
-
 #define PORT 82
 #define MAX_LOADSTRING 100
 #define BUFFER_SIZE 1024 // Taille du tampon de lecture
 
 using json = nlohmann::json;
-
 
 // Variables globales :
 HINSTANCE hInst;
@@ -23,11 +21,19 @@ HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+SocketManager* SocketManager::sInstance = nullptr;
 
-SocketManager* SocketManager::pInstance = nullptr;
+HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
+{
+	hInst = hInstance; // Stocke le handle d'instance dans la variable globale
+
+	HWND hWnd = CreateWindowW(L"Window", L"", WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	return hWnd;
+}
 
 void SocketManager::Initialize() {
-	SocketManager::pInstance = new SocketManager();
+    SocketManager::sInstance = new SocketManager();
 
     HINSTANCE hInstance = GetModuleHandleA(0);
     GameManager::Initialize();
@@ -38,17 +44,16 @@ void SocketManager::Initialize() {
     hWnd = InitInstance(hInstance, 0);
 
     if (hWnd == NULL) {
-        return ;
+        return;
     }
     // Initialisation de Winsock
     WSAData wsaData;
     WORD version = MAKEWORD(2, 2);
     if (WSAStartup(version, &wsaData) != 0) {
         MessageBox(hWnd, L"WSAStartup error", L"Error", MB_OK | MB_ICONERROR);
-        return ;
+        return;
     }
 }
-
 
 ATOM SocketManager::MyRegisterClass(HINSTANCE hInstance) {
     WNDCLASSEXW wcex;
@@ -109,7 +114,7 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                 if (bBuffer.buf[0] != NULL) {
                     int i = 0;
                     std::string message;
-                    while (bBuffer.buf[i] != '\n' && i < bBuffer.len) {
+                    while (bBuffer.buf[i] != '\n' && i < static_cast<int>(bBuffer.len)) {
                         message += bBuffer.buf[i];
                         i++;
                     }
@@ -182,4 +187,9 @@ void SocketManager::Read() {
 
 
 SocketManager::~SocketManager() {
+}
+
+SocketManager::SocketManager()
+{
+    listenSocket = NULL;
 }

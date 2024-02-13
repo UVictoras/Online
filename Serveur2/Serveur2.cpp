@@ -13,10 +13,9 @@
 
 int main()
 {
-    SocketManager::Get()->Initialize(); 
+    SocketManager::Initialize(); 
     SocketManager::Get()->Accept();
     SocketManager::Get()->Read();
-
 
     MSG msg;
 
