@@ -36,7 +36,6 @@ void SocketManager::Initialize() {
     SocketManager::sInstance = new SocketManager();
 
     HINSTANCE hInstance = GetModuleHandleA(0);
-    GameManager::Initialize();
     // Initialise les cha�nes globales
     MyRegisterClass(hInstance);
 
@@ -167,6 +166,7 @@ void SocketManager::Connect() {
         }
     }
     WSAAsyncSelect(sock, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
+    GameManager::Initialize(sock);
 }
 
 void SocketManager::Read() {
