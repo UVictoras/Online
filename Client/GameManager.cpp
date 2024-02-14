@@ -114,7 +114,7 @@ void GameManager::PlaceSign()
             if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.y), cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
             {
                 std::cout << "click click" << m_pPlayers->m_iId << "  turn" << m_iTurn<< std::endl;
-                if (m_iTurn == m_pPlayers->m_iId)
+                if (m_iTurn == 1)
                 {
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
                         SendJSON(cCase->m_iIndex);
