@@ -41,11 +41,13 @@ void GameManager::AssignPlayer(SOCKET sSock) {
     if (m_pPlayers[0]->m_sSock == NULL && m_pPlayers[1]->m_sSock != sSock && m_jClient["Name"] != " ") {
         m_pPlayers[0]->m_sName = m_jClient["Name"];
         m_pPlayers[0]->m_sSock = sSock;
+        m_pPlayers[0]->m_sId = 0;
         std::cout << "p1: " << m_pPlayers[0]->m_sName << " sock: " << m_pPlayers[0]->m_sSock << std::endl;
     }
     else if (m_pPlayers[1]->m_sSock == NULL && m_pPlayers[0]->m_sSock != sSock && m_jClient["Name"] != " " && m_pPlayers[0]->m_sSock != NULL) {
         m_pPlayers[1]->m_sName = m_jClient["Name"];
         m_pPlayers[1]->m_sSock = sSock;
+        m_pPlayers[1]->m_sId = 1;
         std::cout << "p2: " << m_pPlayers[1]->m_sName << " sock: " << m_pPlayers[1]->m_sSock << std::endl;
     }
 }
