@@ -175,13 +175,16 @@ void SocketManager::Read() {
     while (GetMessage(&msg, nullptr, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-        if (GameManager::Get()->m_jServ["GameReady"] == true) {
-            std::cout << "UwU sussy baka desu" << std::endl;
+        //std::cout << GameManager::Get()->m_jServ["GameReady"] << std::endl;
+        if (GameManager::Get()->m_jServ["GameRunning"] == true) {
+            if (!GameManager::Get()->IsEventInit) {
+                GameManager::Get()->InitGameEvent();
+            }
+            GameManager::Get()->GameLoop();
+            
         }
     }
 }
-
-
 
 SocketManager::~SocketManager() {
 }

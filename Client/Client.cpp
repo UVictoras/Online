@@ -11,12 +11,13 @@
 #pragma comment(lib, "ws2_32.lib")
 
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+int APIENTRY main(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
 	SocketManager::Initialize();
+	EventManager::Initialize();
 	SocketManager::Get()->Connect();
 	GameManager::Get()->GetName();
 	SocketManager::Get()->Read();

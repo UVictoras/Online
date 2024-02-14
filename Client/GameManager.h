@@ -39,6 +39,8 @@ public:
 
 public:
 
+	bool IsEventInit;
+
 	Player* m_pPlayers;
 
 	Case* m_cCasesList[9];
@@ -73,7 +75,9 @@ public:
 	// CREER LA FONCTION POUR RECUPERER LA REPONSE DU SERV APRES AVOIR CLIQUER ET SI LE COUP EST VALIDE ON AFFICHE
 	void GetName();
 
-	void GameLoop(SOCKET* sock, HWND hWnd);
+	void GameLoop();
+
+	void InitGameEvent();
 
 	//Events
 

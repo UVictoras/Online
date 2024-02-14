@@ -18,6 +18,6 @@ int main()
 	SocketManager::Get()->Accept();
 	SocketManager::Get()->Read();
 
-
+	
 	return 0;
 }

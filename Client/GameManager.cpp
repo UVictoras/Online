@@ -42,6 +42,8 @@ GameManager::GameManager(SOCKET sSock) : oWindow(sf::VideoMode(920, 920), "Casse
     m_bWon1 = false;
     m_bWon2 = false;
     m_bDraw = false;
+    IsEventInit = false;
+    m_iTurn = 0;
 
     m_jServ["GameReady"] = false;
 
@@ -76,7 +78,11 @@ void GameManager::CloseWindow()
     oWindow.close();
 }
 
-void GameManager::GetJSON(json jServ) { m_jServ = jServ; }
+void GameManager::GetJSON(json jServ) { 
+    m_jServ = jServ;
+    m_iTurn = m_jServ["PlayerTurn"];
+    m_pPlayers->m_iId = m_jServ["Id"];
+}
 
 void GameManager::SendJSON(int cell)  
 {
@@ -284,21 +290,14 @@ void GameManager::GetName() {
     SendJSON(-1);
 }
 
-void GameManager::GameLoop(SOCKET* sock, HWND hWnd)
-{
-
-    sf::Clock oClock;
-    float fDeltaTime = oClock.restart().asSeconds();
-    sf::Clock clock;
-    float fpsLimit = 1 / 120;
-    float fps = 0;
-
+void GameManager::InitGameEvent() {
     EventManager::Get()->AddComponent(sf::Event::EventType::KeyPressed, sf::Keyboard::Key::Escape, &EventCloseWindow);
     EventManager::Get()->AddComponent(sf::Event::EventType::MouseButtonPressed, sf::Mouse::Left, &EventPlaceSign);
+    IsEventInit = true;
+}
 
-    //GameLoop
-    while (oWindow.isOpen() && m_bWon1 == false && m_bWon2 == false && m_bDraw == false)
-    {
+void GameManager::GameLoop()
+{
         //EVENT
         EventManager::Get()->Update(&oWindow);
 
@@ -324,12 +323,4 @@ void GameManager::GameLoop(SOCKET* sock, HWND hWnd)
         
 
         oWindow.display();
-        fDeltaTime = oClock.restart().asSeconds();
-        if (fDeltaTime < fpsLimit)
-        {
-            sf::sleep(sf::seconds(fpsLimit - fDeltaTime));
-            fDeltaTime += fpsLimit - fDeltaTime;
-        }
-        fps = 1.f / fDeltaTime;
-    }
 }

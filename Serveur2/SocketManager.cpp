@@ -127,6 +127,7 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     bBuffer.buf = cBufferData;
                     GameManager::Get()->GetJSON(j);
                     SocketManager::Get()->AssignSocket(sInfoSocket);
+                    std::cout << j << std::endl;
 
                 }
             }
@@ -193,7 +194,7 @@ void SocketManager::Read() {
                 GameManager::Get()->AssignPlayer(sock);
         }
         if (GameManager::Get()->GameReady() == true) {
-            std::cout << "je cum" << std::endl;
+            std::cout << GameManager::Get()->m_jClient << std::endl;
         }
     }
 }

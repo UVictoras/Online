@@ -80,6 +80,7 @@ void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
         m_jServ["ValidMove"] = ValidMove;
         m_jServ["PlayerTurn"] = (m_iTurn == pPlayer->m_sId) ? true : false;
         m_jServ["Grid"] = m_Grid;
+        m_jServ["Id"] = pPlayer->m_sId;
         std::string jtext = m_jServ.dump() + "\n";
         // send json to server
         int bytesSent = send(pPlayer->m_sSock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
