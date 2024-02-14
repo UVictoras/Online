@@ -110,8 +110,10 @@ void GameManager::PlaceSign()
     {
         if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.x), cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
         {
+            std::cout << "click clack clack" << std::endl;
             if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.y), cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
             {
+                std::cout << "click click" << m_pPlayers->m_iId << std::endl;
                 if (m_iTurn == m_pPlayers->m_iId)
                 {
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
