@@ -53,15 +53,19 @@ void GameManager::AssignPlayer(SOCKET sSock) {
 }
 
 void GameManager::PlaceSign(json m_jClient) {
-    if (m_Grid[m_jClient["Cell"]] == 0) {
-        if (m_pPlayers[m_iTurn]->m_sId == m_jClient["Id"])
-        {
-            m_Grid[m_jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
-            ChangeTurn();
-            SendJSON(true, true);
-            return;
+    if (m_jClient["Cell"] != -1) {
+        if (m_Grid[m_jClient["Cell"]] == 0) {
+            if (m_pPlayers[m_iTurn]->m_sId == m_jClient["Id"])
+            {
+                std::cout << "Serv Move TRUE" << std::endl;
+                m_Grid[m_jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
+                ChangeTurn();
+                SendJSON(true, true);
+                return;
+            }
         }
     }
+    std::cout << " MAIS WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT" << std::endl;
     SendJSON(true, false);
 }
 

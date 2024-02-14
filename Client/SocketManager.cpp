@@ -117,6 +117,7 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     bBuffer.buf = nullptr;
                     bBuffer.buf = cBufferData;
                     GameManager::Get()->GetJSON(j);
+                    std::cout << "Move: " << j["ValidMove"] << std::endl;
                 }
             }
             break;
@@ -192,4 +193,5 @@ SocketManager::~SocketManager() {
 SocketManager::SocketManager()
 {
     listenSocket = NULL;
+    sSocket = NULL;
 }

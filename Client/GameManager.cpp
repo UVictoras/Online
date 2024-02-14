@@ -90,7 +90,7 @@ void GameManager::SendJSON(int cell)
         m_jClient["Id"] = m_pPlayers->m_iId;
         std::string jtext = m_jClient.dump() + "\n";
         // send json to server
-        std::cout << "chaussette" << sock << std::endl;
+        //std::cout << "chaussette" << sock << std::endl;
         int bytesSent = send(sock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
         if (bytesSent == SOCKET_ERROR)
         {
