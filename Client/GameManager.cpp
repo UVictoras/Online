@@ -37,12 +37,13 @@ void EventPlaceSign()
 -----------------------------------------------------------------------
 */
 
-GameManager::GameManager(SOCKET* input) : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
+GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
 {
-    sock = input;
     m_bWon1 = false;
     m_bWon2 = false;
     m_bDraw = false;
+
+    m_jServ["GameReady"] = false;
 
     m_rBackground = new GameObject(true, 0, 0, 920, 920, sf::Color::White);
 
@@ -72,6 +73,8 @@ void GameManager::CloseWindow()
 {
     oWindow.close();
 }
+
+void GameManager::GetJSON(json jServ) { m_jServ = jServ; }
 
 void GameManager::SendJSON(int cell)  
 {

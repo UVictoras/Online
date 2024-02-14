@@ -75,6 +75,10 @@ ATOM SocketManager::MyRegisterClass(HINSTANCE hInstance) {
     return RegisterClassExW(&wcex);
 }
 
+void SocketManager::AssignSocket(SOCKET sock) {
+    vSockets.push_back(sock);
+}
+
 LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     SOCKET sAccept, sInfoSocket;
     WSABUF bBuffer;
@@ -93,7 +97,6 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
         {
             sAccept = accept(wParam, NULL, NULL);
             std::cout << "New connection on socket " << sAccept << std::endl;
-            vSockets.push_back(&sAccept);
             //MessageBox(hWnd, L"New connection", L"Notification", MB_OK | MB_ICONINFORMATION);
             WSAAsyncSelect(sAccept, hWnd, WM_USER + 1, FD_READ | FD_CLOSE);
             break;
@@ -123,6 +126,8 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     bBuffer.buf = nullptr;
                     bBuffer.buf = cBufferData;
                     GameManager::Get()->GetJSON(j);
+                    SocketManager::Get()->AssignSocket(sInfoSocket);
+
                 }
             }
             break;
@@ -184,10 +189,10 @@ void SocketManager::Read() {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
         if (GameManager::Get()->GameReady() == false) {
-            for (SOCKET* sock:vSockets)
-                GameManager::Get()->AssignPlayer(*sock);
+            for (SOCKET sock:vSockets)
+                GameManager::Get()->AssignPlayer(sock);
         }
-        else if (GameManager::Get()->GameReady() == true) {
+        if (GameManager::Get()->GameReady() == true) {
             std::cout << "je cum" << std::endl;
         }
     }

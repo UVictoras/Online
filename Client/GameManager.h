@@ -25,9 +25,11 @@ private:
 
 public:
 
-	static void Initialize(SOCKET* input)
+	json m_jServ;
+
+	static void Initialize()
 	{
-		GameManager::pInstance = new GameManager(input);
+		GameManager::pInstance = new GameManager();
 	}
 
 	static GameManager* Get()
@@ -51,7 +53,9 @@ public:
 
 	int m_iTurn;
 
-	GameManager(SOCKET* input);
+	GameManager();
+
+	void GetJSON(json jServ);
 
 	void SendJSON(int cell);
 

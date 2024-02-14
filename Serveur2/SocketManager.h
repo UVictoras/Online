@@ -18,7 +18,7 @@ private:
 	static SocketManager* sInstance;
 
 public:
-	std::vector<SOCKET*> vSockets;
+	std::vector<SOCKET> vSockets;
 
     static void Initialize();
 	static SocketManager* Get() {
@@ -34,6 +34,7 @@ public:
 	static ATOM MyRegisterClass(HINSTANCE hInstance);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
+	void AssignSocket(SOCKET sock);
 	void Accept();
 	void Read();
 
