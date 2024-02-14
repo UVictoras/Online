@@ -27,6 +27,8 @@ public:
 
 	json m_jServ;
 
+	SOCKET sock;
+
 	static void Initialize(SOCKET sSock)
 	{
 		GameManager::pInstance = new GameManager(sSock);

@@ -13,8 +13,6 @@ json jClient; //json message to send to server
 
 GameManager* GameManager::pInstance = nullptr;
 
-SOCKET* sock = nullptr;
-
 /*
 -----------------------------------------------------------------------
 |      Following are the functions used in the EventManager maps      |
@@ -54,7 +52,7 @@ GameManager::GameManager(SOCKET sSock) : oWindow(sf::VideoMode(920, 920), "Casse
 
     m_pPlayers = new Player();
 
-    sock = &sSock;
+    sock = sSock;
 
     // create a JSON object
     
@@ -92,12 +90,15 @@ void GameManager::SendJSON(int cell)
         m_jClient["Id"] = m_pPlayers->m_iId;
         std::string jtext = m_jClient.dump() + "\n";
         // send json to server
-        int bytesSent = send(*sock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
+        std::cout << "chaussette" << sock << std::endl;
+        int bytesSent = send(sock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
         if (bytesSent == SOCKET_ERROR)
         {
+            int error = WSAGetLastError();
+            std::cout << "erreur:" << error;
             if (WSAGetLastError() != WSAEWOULDBLOCK)
             {
-                closesocket(*sock);
+                closesocket(sock);
                 WSACleanup();
             }
         }
@@ -110,13 +111,14 @@ void GameManager::PlaceSign()
     {
         if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.x), cCase->m_fX, cCase->m_fX + cCase->m_fSizeL) == true)
         {
-            std::cout << "click clack clack" << std::endl;
             if (Math::IsInsideInterval(static_cast<float>(vLocalPosition.y), cCase->m_fY, cCase->m_fY + cCase->m_fSizeH) == true)
             {
-                std::cout << "click click" << m_pPlayers->m_iId << "  turn" << m_iTurn<< std::endl;
-                if (m_iTurn == m_pPlayers->m_iId)
+                //std::cout << "click click" << m_pPlayers->m_iId << "  turn" << m_iTurn<< std::endl;
+                if (m_iTurn == 1)
                 {
+                    //std::cout << "suuui" << std::endl;
                     if (m_gCasesBack[cCase->m_iIndex] == nullptr) {
+                        //std::cout << "suuui" << std::endl;
                         SendJSON(cCase->m_iIndex);
                     }
                 }
