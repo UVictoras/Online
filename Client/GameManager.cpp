@@ -37,7 +37,7 @@ void EventPlaceSign()
 -----------------------------------------------------------------------
 */
 
-GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
+GameManager::GameManager(SOCKET sSock) : oWindow(sf::VideoMode(920, 920), "Casse-Brique") // Calling RenderWindow constructor for our game window
 {
     m_bWon1 = false;
     m_bWon2 = false;
@@ -51,6 +51,8 @@ GameManager::GameManager() : oWindow(sf::VideoMode(920, 920), "Casse-Brique") //
     CreateSign();
 
     m_pPlayers = new Player();
+
+    sock = &sSock;
 
     // create a JSON object
     

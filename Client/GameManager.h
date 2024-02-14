@@ -27,9 +27,9 @@ public:
 
 	json m_jServ;
 
-	static void Initialize()
+	static void Initialize(SOCKET sSock)
 	{
-		GameManager::pInstance = new GameManager();
+		GameManager::pInstance = new GameManager(sSock);
 	}
 
 	static GameManager* Get()
@@ -53,7 +53,7 @@ public:
 
 	int m_iTurn;
 
-	GameManager();
+	GameManager(SOCKET sSock);
 
 	void GetJSON(json jServ);
 
