@@ -117,11 +117,11 @@ void GameManager::UpdateGrid(json servJSON) {
 
                 if (m_gCasesBack[i] == nullptr && servJSON["Grid"][i] == 1)
                 {
-                    m_gCasesBack[i] = new GameObject(false, static_cast<float>(i % 3 * (290 + 25) + 25), static_cast<float>(i / 3 * (290 + 25) + 25), 125.0, 125.0, sf::Color::White);
+                    m_gCasesBack[i] = new GameObject(true, static_cast<float>(i % 3 * (290 + 25) + 290/2 - 100), static_cast<float>(i / 3 * (290 + 25) + 290 / 2 - 100), 200.0, 200.0, sf::Color::Red);
                 }
                 else if (m_gCasesBack[i] == nullptr && servJSON["Grid"][i] == 2)
                 {
-                    m_gCasesBack[i] = new GameObject(true, static_cast<float>(i + 290 / 2 - 100), static_cast<float>(i + 290 / 2 - 100), 200.0, 200.0, sf::Color::Red);
+                    m_gCasesBack[i] = new GameObject(false, static_cast<float>(i % 3 * (290 + 25) + 25), static_cast<float>(i / 3 * (290 + 25) + 25), 125.0, 125.0, sf::Color::White);
                 }
             }
         }
