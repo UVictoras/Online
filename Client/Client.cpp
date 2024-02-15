@@ -1,4 +1,4 @@
-// Serveur2.cpp : Définit le point d'entrée de l'application.
+// Serveur2.cpp : DÃ©finit le point d'entrÃ©e de l'application.
 //
 
 #include "GameManager.h"

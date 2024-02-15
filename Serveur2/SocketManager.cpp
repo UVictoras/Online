@@ -1,21 +1,20 @@
-﻿#include "SocketManager.h"
-
+#include "SocketManager.h"
 #include "framework.h"
 #pragma comment(lib, "ws2_32.lib")
 
 #define PORT 99
+
 #define MAX_LOADSTRING 100
 #define BUFFER_SIZE 1024 // Taille du tampon de lecture
 
 using json = nlohmann::json;
 
-// Variables globales�:
+// Variables globalesï¿½:
 HINSTANCE hInst;
 HWND hWnd;// instance actuelle
 WCHAR szTitle[MAX_LOADSTRING];                  // Texte de la barre de titre
-WCHAR szWindowClass[MAX_LOADSTRING];            // nom de la classe de fen�tre principale
+WCHAR szWindowClass[MAX_LOADSTRING];            // nom de la classe de fenï¿½tre principale
 
-// D�clarations anticip�es des fonctions incluses dans ce module de code�:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 HWND                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -37,10 +36,10 @@ void SocketManager::Initialize() {
 
     HINSTANCE hInstance = GetModuleHandleA(0);
     GameManager::Initialize();
-    // Initialise les cha�nes globales
+    // Initialise les chaï¿½nes globales
     MyRegisterClass(hInstance);
 
-    // Effectue l'initialisation de l'application�:
+    // Effectue l'initialisation de l'applicationï¿½:
     hWnd = InitInstance(hInstance, 0);
 
     if (hWnd == NULL) {
@@ -161,7 +160,7 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
 }
 
 void SocketManager::Accept() {
-    // Cr�ation du socket pour �couter les connexions entrantes
+    // Crï¿½ation du socket pour ï¿½couter les connexions entrantes
     listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenSocket == INVALID_SOCKET) {
         WSACleanup();
@@ -169,11 +168,11 @@ void SocketManager::Accept() {
         return;
     }
 
-    // Liaison du socket � l'adresse locale et au port
+    // Liaison du socket ï¿½ l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY; // �coute sur toutes les interfaces locales
-    serverAddr.sin_port = htons(PORT); // Port d'�coute
+    serverAddr.sin_addr.s_addr = INADDR_ANY; // ï¿½coute sur toutes les interfaces locales
+    serverAddr.sin_port = htons(PORT); // Port d'ï¿½coute
     if (bind(listenSocket, (const sockaddr*)&serverAddr, (int)sizeof(serverAddr)) == SOCKET_ERROR) {
         int errorCode = WSAGetLastError();
         closesocket(listenSocket);
@@ -182,7 +181,7 @@ void SocketManager::Accept() {
         return;
     }
 
-    // Mettre le socket en mode �coute
+    // Mettre le socket en mode ï¿½coute
     if (listen(listenSocket, 0) == SOCKET_ERROR) {
         closesocket(listenSocket);
         WSACleanup();
