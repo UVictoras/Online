@@ -1,11 +1,14 @@
 #pragma once
-#include "GameManagerS.h"
+#include "GameManager.h"
 #include "framework.h"
-#include "Serveur2.h"
+#include "Client.h"
 #include <iostream>
 #include <string>
 #include "../json-develop/single_include/nlohmann/json.hpp"
 #pragma comment(lib, "ws2_32.lib")
+#include <ws2tcpip.h>
+#include <codecvt>
+#include <locale>
 
 class SocketManager
 {
@@ -18,9 +21,10 @@ private:
 	static SocketManager* sInstance;
 
 public:
-	std::vector<SOCKET> vSockets;
 
-    static void Initialize();
+	SOCKET sSocket;
+
+	static void Initialize();
 	static SocketManager* Get() {
 		return sInstance;
 	}
@@ -32,10 +36,11 @@ public:
 	SocketManager();
 
 	static ATOM MyRegisterClass(HINSTANCE hInstance);
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	void AssignSocket(SOCKET sock);
-	void Accept();
+	void Connect();
 	void Read();
 
 };
+

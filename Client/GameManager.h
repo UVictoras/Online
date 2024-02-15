@@ -21,13 +21,17 @@ private:
 
 	bool m_bWon1, m_bWon2, m_bDraw, GameRunning;
 
-	json m_jClient ; 
+	json m_jClient;
 
 public:
 
-	static void Initialize(SOCKET* input)
+	json m_jServ;
+
+	SOCKET sock;
+
+	static void Initialize(SOCKET sSock)
 	{
-		GameManager::pInstance = new GameManager(input);
+		GameManager::pInstance = new GameManager(sSock);
 	}
 
 	static GameManager* Get()
@@ -36,6 +40,8 @@ public:
 	}
 
 public:
+
+	bool IsEventInit;
 
 	Player* m_pPlayers;
 
@@ -51,7 +57,9 @@ public:
 
 	int m_iTurn;
 
-	GameManager(SOCKET* input);
+	GameManager(SOCKET sSock);
+
+	void GetJSON(json jServ);
 
 	void SendJSON(int cell);
 
@@ -61,6 +69,8 @@ public:
 
 	void CheckWin();
 
+	bool CheckLine(int start, int step);
+
 	void CheckDraw();
 
 	bool IsFullGrid();
@@ -69,11 +79,16 @@ public:
 	// CREER LA FONCTION POUR RECUPERER LA REPONSE DU SERV APRES AVOIR CLIQUER ET SI LE COUP EST VALIDE ON AFFICHE
 	void GetName();
 
-	void GameLoop(SOCKET* sock,HWND hWnd);
+	void GameLoop();
+
+	void InitGameEvent();
 
 	//Events
 
 	void CloseWindow();
 
 	void PlaceSign();
+
+	void UpdateGrid(json servJSON);
+
 };

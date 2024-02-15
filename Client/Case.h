@@ -10,9 +10,7 @@ public:
 
 	char m_sSignFill;
 
-	sf::Texture m_tTexture;
-
-	Case(bool bType, float fX, float fY, int iIndex, float fSizeL, float fSizeH, sf::Color cColor, sf::Texture* tTexture);
+	Case(bool bType, float fX, float fY, int iIndex, float fSizeL, float fSizeH, sf::Color cColor);
 
 	void FillGrid(char sSign, sf::Texture* tTextureX, sf::Texture* tTextureCircle);
 };
