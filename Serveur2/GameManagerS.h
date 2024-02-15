@@ -56,6 +56,8 @@ public:
 
 	void CheckWin();
 
+	void CheckAndSetWinner(int a, int b, int c);
+
 	void CheckDraw();
 
 	bool IsFullGrid();

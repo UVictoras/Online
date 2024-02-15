@@ -25,10 +25,10 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
     m_bDraw = false;
     m_iTurn = 0;
 
-    Player* m_pPlayer = new Player('x', " ", 1);
+    Player* m_pPlayer = new Player(1, " ", 1);
     m_pPlayers.push_back(m_pPlayer);
 
-    m_pPlayer = new Player('o', " " , 2);
+    m_pPlayer = new Player(2, " ", 2);
     m_pPlayers.push_back(m_pPlayer);
 
     m_Grid = { 0,0,0,0,0,0,0,0,0 };
@@ -37,7 +37,6 @@ GameManager::GameManager()// Calling RenderWindow constructor for our game windo
 }
 
 void GameManager::AssignPlayer(SOCKET sSock) {
-    //std::cout << "CONDITION: " << (m_pPlayers[0]->m_sSock != sSock) << std::endl;
     if (m_pPlayers[0]->m_sSock == NULL && m_pPlayers[1]->m_sSock != sSock && m_jClient["Name"] != " ") {
         m_pPlayers[0]->m_sName = m_jClient["Name"];
         m_pPlayers[0]->m_sSock = sSock;
@@ -57,6 +56,7 @@ void GameManager::PlaceSign(json m_jClient) {
         if (m_Grid[m_jClient["Cell"]] == 0) {
             if (m_pPlayers[m_iTurn]->m_sId == m_jClient["Id"])
             {
+                cout << m_jClient["Cell"] << endl;
                 std::cout << "Serv Move TRUE" << std::endl;
                 m_Grid[m_jClient["Cell"]] = m_pPlayers[m_iTurn]->m_sSign;
                 ChangeTurn();
@@ -65,7 +65,6 @@ void GameManager::PlaceSign(json m_jClient) {
             }
         }
     }
-    std::cout << " MAIS WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT" << std::endl;
     SendJSON(true, false);
 }
 
@@ -87,7 +86,9 @@ void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
         m_jServ["PlayerTurn"] = (m_iTurn == pPlayer->m_sId) ? true : false;
         m_jServ["Grid"] = m_Grid;
         m_jServ["Id"] = pPlayer->m_sId;
-        std::string jtext = m_jServ.dump() + "\n";
+        std::string jtext = m_jServ.dump(-1) + "\n";
+        int jLen = sizeof(jtext);
+        jtext = (char)jLen + jtext;
         // send json to server
         int bytesSent = send(pPlayer->m_sSock, jtext.c_str(), static_cast<int>(strlen(jtext.c_str())), 0);
         if (bytesSent == SOCKET_ERROR)
@@ -99,10 +100,9 @@ void GameManager::SendJSON(bool GameRunnig, bool ValidMove) {
             }
         }
     }
-   
 }
 
-void GameManager::GetJSON(json jClient) { m_jClient = jClient;}
+void GameManager::GetJSON(json jClient) { m_jClient = jClient; }
 
 void GameManager::ChangeTurn() {
     if (m_iTurn)
@@ -111,49 +111,30 @@ void GameManager::ChangeTurn() {
         m_iTurn = 1;
 }
 
-void GameManager::CheckWin()
-{
+void GameManager::CheckWin() {
     // VERIFICATION COLUMN
     for (int x = 0; x < 3; x++) {
-        if (m_Grid[x] != 0 and m_Grid[x + 3] != 0 and m_Grid[x + 6] != 0) {
-            if (m_Grid[x] == m_Grid[x + 3] and m_Grid[x + 6] == m_Grid[x]) {
-                if (m_Grid[x] == m_pPlayers[0]->m_sSign)
-                    m_pPlayers[0]->m_sWin = true;
-                else
-                    m_pPlayers[1]->m_sWin = true;
-            }
-        }
+        CheckAndSetWinner(m_Grid[x], m_Grid[x + 3], m_Grid[x + 6]);
     }
 
     // VERIFICATION LINE
     for (int y = 0; y < 3; y++) {
-        if (m_Grid[y * 3] != 0 and m_Grid[y * 3 + 1] != 0 and m_Grid[y * 3 + 2] != 0) {
-            if (m_Grid[y * 3] == m_Grid[y * 3 + 1] and m_Grid[y * 3 + 2] == m_Grid[y * 3]) {
-                if (m_Grid[y] == m_pPlayers[0]->m_sSign)
-                    m_pPlayers[0]->m_sWin = true;
-                else
-                    m_pPlayers[1]->m_sWin = true;
-            }
-        }
+        CheckAndSetWinner(m_Grid[y * 3], m_Grid[y * 3 + 1], m_Grid[y * 3 + 2]);
+    }
 
-        // VERIFICATION DIAGONAL
-        if (m_Grid[0] != 0 and m_Grid[4] != 0 and m_Grid[8] != 0) {
-            if (m_Grid[0] == m_Grid[4] and m_Grid[8] == m_Grid[0]) {
-                if (m_Grid[0] == m_pPlayers[0]->m_sSign)
-                    m_pPlayers[0]->m_sWin = true;
-                else
-                    m_pPlayers[1]->m_sWin = true;
-            }
-        }
-        if (m_Grid[2] != 0 and m_Grid[4] != 0 and m_Grid[6] != 0) {
-            if (m_Grid[2] == m_Grid[4] and m_Grid[6] == m_Grid[2]) {
-                if (m_Grid[3] == m_pPlayers[0]->m_sSign)
-                    m_pPlayers[0]->m_sWin = true;
-                else
-                    m_pPlayers[1]->m_sWin = true;
-            }
-        }
+    // VERIFICATION DIAGONAL
+    CheckAndSetWinner(m_Grid[0], m_Grid[4], m_Grid[8]);
+    CheckAndSetWinner(m_Grid[2], m_Grid[4], m_Grid[6]);
+}
 
+void GameManager::CheckAndSetWinner(int a, int b, int c) {
+    if (a != 0 and b != 0 and c != 0) {
+        if (a == b and c == a) {
+            if (a == 1)
+                m_pPlayers[0]->m_sWin = true;
+            else
+                m_pPlayers[1]->m_sWin = true;
+        }
     }
 }
 

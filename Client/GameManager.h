@@ -69,6 +69,8 @@ public:
 
 	void CheckWin();
 
+	bool CheckLine(int start, int step);
+
 	void CheckDraw();
 
 	bool IsFullGrid();

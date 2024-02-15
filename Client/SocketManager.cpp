@@ -110,14 +110,15 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     int i = 0;
                     std::string message;
                     while (bBuffer.buf[i] != '\n' && i < static_cast<int>(bBuffer.len)) {
-                        message += bBuffer.buf[i];
+                        if (bBuffer.buf[i] != '(')
+                            message += bBuffer.buf[i];
                         i++;
                     }
                     json j = json::parse(message);
                     bBuffer.buf = nullptr;
                     bBuffer.buf = cBufferData;
                     GameManager::Get()->GetJSON(j);
-                    std::cout << "Move: " << j["ValidMove"] << std::endl;
+                    GameManager::Get()->UpdateGrid(j);
                 }
             }
             break;
@@ -138,24 +139,20 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
     }
 }
 
-
 void SocketManager::Connect() {
     // Création du socket pour écouter les connexions entrantes
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
         WSACleanup();
-        return ;
+        return;
     }
 
     // Liaison du socket à l'adresse locale et au port
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    // serverAddr.sin_addr.s_addr = inet_addr("10.1.144.36"); // Écoute sur toutes les interfaces locales
-     //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Écoute sur toutes les interfaces locales
-    InetPton(AF_INET, L"10.1.144.35", &serverAddr.sin_addr.s_addr);
+    InetPton(AF_INET, L"127.0.0.1", &serverAddr.sin_addr.s_addr);
     serverAddr.sin_port = htons(PORT); // Port d'écoute
 
-    //if (WSAConnect(sock, (const sockaddr*)(&serverAddr), sizeof(serverAddr), nullptr, nullptr, nullptr, nullptr) == SOCKET_ERROR) {
     if (connect(sock, (const sockaddr*)(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR) {
         int error = WSAGetLastError();
         if (error != WSAEWOULDBLOCK) {
@@ -176,13 +173,11 @@ void SocketManager::Read() {
     while (GetMessage(&msg, nullptr, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-        //std::cout << GameManager::Get()->m_jServ["GameReady"] << std::endl;
         if (GameManager::Get()->m_jServ["GameRunning"] == true) {
             if (!GameManager::Get()->IsEventInit) {
                 GameManager::Get()->InitGameEvent();
             }
             GameManager::Get()->GameLoop();
-            
         }
     }
 }

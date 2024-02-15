@@ -106,9 +106,10 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
             sInfoSocket = wParam;
             if (WSARecv(sInfoSocket, &bBuffer, 1, &wBytes, &wFlags, NULL, NULL) == SOCKET_ERROR)
             {
-                if (WSAGetLastError() != WSAEWOULDBLOCK)
+                int errorCode = WSAGetLastError();
+                if (errorCode != WSAEWOULDBLOCK)
                 {
-                    MessageBox(hWnd, L"Notification failed", L"Notification", MB_OK | MB_ICONERROR);
+                    std::cerr << "WSARecv failed with error code: " << errorCode << std::endl;
                     closesocket(sInfoSocket);
                     return 0;
                 }
@@ -119,15 +120,26 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     int i = 0;
                     std::string message;
                     while (bBuffer.buf[i] != '\n' && i < static_cast<int>(bBuffer.len)) {
-                        message += bBuffer.buf[i];
+                        if (bBuffer.buf[i] != '(')
+                            message += bBuffer.buf[i];
                         i++;
                     }
-                    json j = json::parse(message);
-                    bBuffer.buf = nullptr;
-                    bBuffer.buf = cBufferData;
-                    GameManager::Get()->GetJSON(j);
-                    SocketManager::Get()->AssignSocket(sInfoSocket);
+                    try {
+                        json j = json::parse(message);
+                        // Handle the parsed JSON data
+                        bBuffer.buf = nullptr;
+                        std::fill(std::begin(cBufferData), std::end(cBufferData), 0);
+                        bBuffer.buf = cBufferData;
+                        GameManager::Get()->GetJSON(j);
+                    }
+                    catch (const nlohmann::json::exception& e) {
+                        std::cout << "JSON parsing error: " << e.what() << std::endl;
+                        // Handle the error (e.g., log it, close the socket, etc.)
+                        closesocket(sInfoSocket);
+                        return 0;
+                    }
 
+                    SocketManager::Get()->AssignSocket(sInfoSocket);
                 }
             }
             break;
@@ -147,7 +159,6 @@ LRESULT CALLBACK SocketManager::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
     }
     return 0;
 }
-
 
 void SocketManager::Accept() {
     // Cr�ation du socket pour �couter les connexions entrantes
@@ -189,7 +200,7 @@ void SocketManager::Read() {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
         if (GameManager::Get()->GameReady() == false) {
-            for (SOCKET sock:vSockets)
+            for (SOCKET sock : vSockets)
                 GameManager::Get()->AssignPlayer(sock);
         }
         if (GameManager::Get()->GameReady() == true) {
@@ -198,8 +209,6 @@ void SocketManager::Read() {
         }
     }
 }
-
-
 
 SocketManager::~SocketManager() {
 }
